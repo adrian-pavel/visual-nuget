@@ -1,0 +1,17 @@
+.package-list {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow-y: scroll;
+
+  & > *:last-child {
+    margin-bottom: 50px;
+  }
+}
+
+.no-packages {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}

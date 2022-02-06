@@ -1,0 +1,40 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
+  font-size: 1rem;
+  min-width: 0;
+  .navbar-start {
+    flex-shrink: 0;
+    .navbar-item {
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+      &:first {
+        margin-left: 0;
+      }
+      &:last {
+        margin-right: 0;
+      }
+
+      &.category-button {
+        font-size: 1rem;
+        background: transparent;
+        color: var(--vscode-tab-hoverForeground);
+        border: none;
+        padding: 0.25rem 0.5rem;
+
+        &:hover {
+          color: var(--vscode-button-background);
+        }
+
+        &.active {
+          color: var(--vscode-button-background);
+          border-bottom: 2px solid var(--vscode-button-background);
+        }
+      }
+    }
+  }
+  .navbar-end {
+    flex-shrink: 0;
+  }
+}

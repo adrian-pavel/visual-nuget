@@ -1,0 +1,21 @@
+<section class="toolbar" aria-label="main toolbar" [formGroup]="searchForm">
+  <div class="toolbar-start">
+    <input type="search" class="search-box" placeholder="Search" formControlName="query" />
+    <button type="button" class="button secondary" (click)="refresh()">
+      <fa-icon icon="redo-alt"></fa-icon>
+    </button>
+    <span class="prerelease-checkbox">
+      <input type="checkbox" formControlName="prerelease" id="prerelease" />
+      <label for="prerelease">Prerelease</label>
+    </span>
+  </div>
+
+  <div class="toolbar-end">
+    <div class="navbar-item">
+      <span class="source-title">Package source:</span>
+      <select class="drop-down" formControlName="source">
+        <option *ngFor="let pkgSource of packageSources" [ngValue]="pkgSource">{{ pkgSource.name }}</option>
+      </select>
+    </div>
+  </div>
+</section>

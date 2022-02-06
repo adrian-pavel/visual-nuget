@@ -1,0 +1,53 @@
+<div *ngIf="package" class="package-details">
+  <div class="header">
+    <div class="icon">
+      <img *ngIf="package.iconUrl" [src]="package.iconUrl" />
+      <fa-icon class="placeholder-icon" *ngIf="!package.iconUrl" icon="cubes"></fa-icon>
+    </div>
+    <div class="name">{{ package.id }}</div>
+  </div>
+  <div *ngIf="package.isInstalled" class="version-container">
+    <span class="label">Installed:</span>
+    <span class="drop-down installed-version-display">{{ package.installedVersion }}</span>
+    <button class="button" (click)="uninstall()">Uninstall</button>
+  </div>
+  <div class="version-container">
+    <span class="label">Version:</span>
+    <select class="drop-down" [formControl]="selectedVersion">
+      <option *ngFor="let version of package.versions">{{ version.version }}</option>
+    </select>
+    <button class="button" (click)="install()">{{ package.isInstalled ? 'Update' : 'Install' }}</button>
+  </div>
+  <div class="description">
+    <p class="label">Description</p>
+    <p class="description-text">{{ package.description }}</p>
+  </div>
+  <div class="details">
+    <div class="details-row">
+      <span class="label">Version:</span>
+      <span class="content">{{ package.version }}</span>
+    </div>
+    <div *ngIf="package.authors" class="details-row">
+      <span class="label">Author(s):</span>
+      <span class="content">{{ package.authors }}</span>
+    </div>
+    <div *ngIf="package.licenseUrl" class="details-row">
+      <span class="label">License:</span>
+      <span class="content"
+        ><a [href]="package.licenseUrl">{{ package.licenseUrl }}</a></span
+      >
+    </div>
+    <div *ngIf="package.projectUrl" class="details-row">
+      <span class="label">Project url:</span>
+      <span class="content"
+        ><a [href]="package.projectUrl">{{ package.projectUrl }}</a></span
+      >
+    </div>
+    <div *ngIf="package.tags?.length" class="details-row">
+      <span class="label">Tags:</span>
+      <span class="content">{{ package.tags }}</span>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!package" class="no-package">No package selected.</div>

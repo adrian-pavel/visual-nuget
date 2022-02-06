@@ -1,0 +1,27 @@
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-start">
+    <button class="navbar-item category-button" [ngClass]="{ active: currentCategory === Category.Browse }" (click)="categoryChange(Category.Browse)">
+      Browse
+    </button>
+    <button
+      class="navbar-item category-button"
+      [ngClass]="{ active: currentCategory === Category.Installed }"
+      (click)="categoryChange(Category.Installed)"
+    >
+      Installed
+    </button>
+    <button
+      class="navbar-item category-button"
+      [ngClass]="{ active: currentCategory === Category.Updates }"
+      (click)="categoryChange(Category.Updates)"
+    >
+      Updates
+    </button>
+  </div>
+
+  <div class="navbar-end">
+    <div class="navbar-item">
+      <span>Visual NuGet: {{ currentProjectName }}</span>
+    </div>
+  </div>
+</nav>

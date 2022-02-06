@@ -1,0 +1,84 @@
+.package-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.5rem;
+  height: 60px;
+  overflow: hidden;
+
+  &:hover {
+    background-color: var(--vscode-list-hoverBackground);
+    color: var(--vscode-list-hoverForeground);
+    .actions {
+      visibility: visible;
+    }
+  }
+
+  &.active {
+    background-color: var(--vscode-list-activeSelectionBackground);
+    color: var(--vscode-list-activeSelectionForeground);
+  }
+
+  .icon {
+    $icon-size: 40px;
+
+    margin-right: 0.75rem;
+    margin-left: 0.25rem;
+    flex-shrink: 0;
+    width: $icon-size;
+    height: $icon-size;
+
+    .placeholder-icon {
+      font-size: $icon-size;
+    }
+  }
+
+  .description-container {
+    flex-grow: 1;
+    overflow: hidden;
+    height: 100%;
+
+    .description-row {
+      .name {
+        font-size: 1rem;
+        font-weight: bold;
+      }
+      .author,
+      .downloads {
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  $versionsActionsHeight: 25px;
+
+  .versions {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+
+    span {
+      line-height: $versionsActionsHeight;
+    }
+  }
+  .actions {
+    visibility: hidden;
+  }
+
+  .actions,
+  .versions {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    white-space: nowrap;
+
+    & > * {
+      height: $versionsActionsHeight;
+
+      &:first-child {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+}

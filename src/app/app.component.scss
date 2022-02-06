@@ -1,0 +1,22 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  $header-height: 103px;
+
+  .header {
+    flex-shrink: 0;
+    height: $header-height;
+    min-width: 525px;
+  }
+  .main-section {
+    display: flex;
+    flex: 1;
+    height: calc(100% - $header-height);
+
+    & > * {
+      flex: 1;
+      min-width: 200px;
+    }
+  }
+}

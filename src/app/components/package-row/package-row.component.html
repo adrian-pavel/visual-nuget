@@ -1,0 +1,31 @@
+<div *ngIf="package" class="package-row" [ngClass]="{ active: isActive }" (click)="select()">
+  <div class="icon">
+    <img *ngIf="package.iconUrl" [src]="package.iconUrl" (error)="package.iconUrl = ''" />
+    <fa-icon class="placeholder-icon" *ngIf="!package.iconUrl" icon="cubes"></fa-icon>
+  </div>
+  <div class="description-container">
+    <div class="description-row">
+      <span class="name">{{ package.id }}</span>
+      <span *ngIf="package.authors" class="author">by {{ package.authors }}</span>
+      <span *ngIf="package.totalDownloads" class="downloads"
+        ><strong>{{ package.totalDownloads | shortNumber }}</strong> downloads</span
+      >
+    </div>
+    <div class="description-row">{{ package.description.length > 180 ? (package.description | slice: 0:177) + '...' : package.description }}</div>
+  </div>
+  <div class="versions">
+    <span *ngIf="package.isOutdated">{{ package.installedVersion }}</span>
+    <span>{{ package.version }}</span>
+  </div>
+  <div class="actions">
+    <button *ngIf="!package.isInstalled" class="button secondary" (click)="install($event)">
+      <fa-icon icon="arrow-down"></fa-icon>
+    </button>
+    <button *ngIf="package.isInstalled" class="button secondary" (click)="uninstall($event)">
+      <fa-icon icon="times-circle"></fa-icon>
+    </button>
+    <button *ngIf="package.isOutdated" class="button secondary" (click)="update($event)">
+      <fa-icon icon="arrow-alt-circle-up"></fa-icon>
+    </button>
+  </div>
+</div>

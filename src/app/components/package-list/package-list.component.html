@@ -1,0 +1,11 @@
+<section *ngIf="packages && packages.length" class="package-list">
+  <app-package-row
+    *ngFor="let package of packages; index as i"
+    [package]="package"
+    [isActive]="package.id === currentSelectedPackageId"
+  ></app-package-row>
+</section>
+
+<div *ngIf="packages && !packages.length" class="no-packages">No packages found for this query.</div>
+
+<div *ngIf="!packages" class="no-packages">Loading...</div>

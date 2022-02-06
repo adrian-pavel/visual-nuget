@@ -1,0 +1,39 @@
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
+  padding-top: 0;
+  .toolbar-start {
+    display: flex;
+    align-items: stretch;
+    padding: 0 0.5rem;
+    flex: 1;
+
+    .search-box {
+      margin-right: 0.25rem;
+      background: var(--vscode-input-background);
+      border: 1px solid var(--vscode-dropdown-border);
+      color: var(--vscode-input-foreground);
+      padding: 0.25rem;
+      flex: 1;
+      max-width: 500px;
+
+      &::placeholder {
+        color: var(--vscode-input-placeholderForeground);
+      }
+    }
+
+    .prerelease-checkbox {
+      align-self: center;
+      display: flex;
+      align-items: flex-start;
+    }
+  }
+  .toolbar-end {
+    display: flex;
+    align-items: stretch;
+    .source-title {
+      margin-right: 0.25rem;
+    }
+  }
+}
