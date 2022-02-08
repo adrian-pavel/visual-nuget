@@ -1,0 +1,8 @@
+.angular
+.vscode
+src
+src-ext
+.browserslistrc
+.gitignore
+tsconfig**.json
+**/**.js.map
