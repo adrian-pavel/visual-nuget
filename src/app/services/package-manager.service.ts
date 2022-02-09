@@ -52,6 +52,30 @@ export class PackageManagerService {
     });
   }
 
+  public queryForPackages(query: string, prerelease: boolean, source: PackageSource): void {
+    this._currentSelectedPackage.next(null);
+    this._currentPackages.next(null);
+
+    const currentCategory = this._currentCategory.value;
+
+    if (currentCategory === Category.Browse) {
+      this.nugetService.search(query, prerelease, source).subscribe((results: SearchResults) => {
+        let packageDetailModels = this.mapSearchResultsToPackageDetails(results.data, source);
+        this.setInstalledInformation(packageDetailModels);
+        this._currentPackages.next(packageDetailModels);
+      });
+    } else {
+      const currentInstalledPackageIds = this.getCurrentInstalledPackageIds();
+      this.nugetService.searchByPackageIds(currentInstalledPackageIds, source).subscribe((results: SearchResults) => {
+        let packageDetailModels = this.mapSearchResultsToPackageDetails(results.data, source);
+        this.setInstalledInformation(packageDetailModels);
+        packageDetailModels = this.filterResultsToMatchCategory(packageDetailModels);
+
+        this._currentPackages.next(packageDetailModels);
+      });
+    }
+  }
+
   public setProject(project: Project) {
     this._currentProjectName.next(project.name);
     this._currentInstalledPackages.next(project.packages);
@@ -64,21 +88,6 @@ export class PackageManagerService {
 
   public setSources(sources: PackageSource[]): void {
     this._currentSources.next(sources);
-  }
-
-  public queryForPackages(query: string, prerelease: boolean, source: PackageSource): void {
-    this._currentSelectedPackage.next(null);
-    this._currentPackages.next(null);
-
-    const queryBasedOnCategory = this.adjustQueryToMatchCategory(query);
-
-    this.nugetService.search(queryBasedOnCategory, prerelease, source).subscribe((results: SearchResults) => {
-      let packageDetailModels = this.mapSearchResultsToPackageDetails(results.data, source);
-      this.setInstalledInformation(packageDetailModels);
-      packageDetailModels = this.filterResultsToMatchCategory(packageDetailModels);
-
-      this._currentPackages.next(packageDetailModels);
-    });
   }
 
   public changeCurrentSelectedPackage(selectedPackage: PackageDetailsModel | null): void {
@@ -144,20 +153,6 @@ export class PackageManagerService {
     });
   }
 
-  private adjustQueryToMatchCategory(query: string): string {
-    const currentCategory = this._currentCategory.value;
-    switch (currentCategory) {
-      case Category.Updates:
-      case Category.Installed: {
-        const queryByPackageId = this.composeQueryByPackageId();
-        return `${queryByPackageId}${query}`;
-      }
-      default: {
-        return query;
-      }
-    }
-  }
-
   private filterResultsToMatchCategory(packageDetailModels: PackageDetailsModel[]): PackageDetailsModel[] {
     const currentCategory = this._currentCategory.value;
     if (currentCategory === Category.Updates) {
@@ -167,17 +162,13 @@ export class PackageManagerService {
     return packageDetailModels;
   }
 
-  private composeQueryByPackageId(): string {
-    let queryByPackageId = '';
+  private getCurrentInstalledPackageIds(): string[] {
     const currentInstalledPackages = this._currentInstalledPackages.value;
 
     if (!currentInstalledPackages) {
-      return queryByPackageId;
+      return [];
     }
 
-    for (const ip of currentInstalledPackages) {
-      queryByPackageId += `PackageId:${ip.id} `;
-    }
-    return queryByPackageId;
+    return currentInstalledPackages.map((ip) => ip.id);
   }
 }
