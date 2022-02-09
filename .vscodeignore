@@ -1,5 +1,6 @@
 .angular
 .vscode
+node_modules
 src
 src-ext
 .browserslistrc
