@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { SearchResults } from '../models/search-results';
+import { SearchResults, Version } from '../models/search-results';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable, switchMap } from 'rxjs';
 import { PackageSource } from '../models/package-source';
 import { ApiIndexResponse } from '../models/api-index-response';
+import { rcompare, coerce } from 'semver';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +29,7 @@ export class NuGetApiService {
     const searchParams = {
       q: query,
       prerelease: prerelease,
-      semVerKevek: '2.0.0',
+      semVerLevel: '2.0.0',
     };
 
     return this.getSearchApiUrl(source, authHeaders).pipe(
@@ -39,7 +40,16 @@ export class NuGetApiService {
         })
       ),
       map((results) => {
-        results.data.forEach((p) => p.versions.reverse());
+        results.data.forEach((pdsr) =>
+          pdsr.versions.sort((v1: Version, v2: Version) => {
+            const cleanV1 = coerce(v1.version);
+            const cleanV2 = coerce(v2.version);
+            if (cleanV1 === null || cleanV2 === null) {
+              return 0;
+            }
+            return rcompare(cleanV1, cleanV2, { includePrerelease: true, loose: true });
+          })
+        );
         return results;
       })
     );
