@@ -2,6 +2,15 @@
   <div class="icon">
     <img *ngIf="package.iconUrl" [src]="package.iconUrl" (error)="package.iconUrl = ''" />
     <fa-icon class="placeholder-icon" *ngIf="!package.iconUrl" icon="cubes"></fa-icon>
+    <fa-stack *ngIf="package.isInstalled" class="status-icon" size="1x">
+      <fa-icon icon="circle" stackItemSize="1x"></fa-icon>
+      <fa-icon
+        class="actual-icon"
+        [ngClass]="{ outdated: package.isOutdated }"
+        [icon]="package.isOutdated ? 'arrow-alt-circle-up' : 'check-circle'"
+        stackItemSize="1x"
+      ></fa-icon>
+    </fa-stack>
   </div>
   <div class="description-container">
     <div class="description-row">
