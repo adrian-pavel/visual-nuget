@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { PackageDetailsModel } from 'src/app/models/package-details';
+import { PackageRowModel } from 'src/app/models/package-details';
+import { CatalogEntry } from 'src/app/models/package-meta';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
 
 @Component({
@@ -10,9 +11,14 @@ import { PackageManagerService } from 'src/app/services/package-manager.service'
   styleUrls: ['./package-details.component.scss'],
 })
 export class PackageDetailsComponent implements OnInit {
-  public package: PackageDetailsModel | null = null;
+  public package: PackageRowModel | null = null;
 
   public selectedVersion: FormControl = new FormControl();
+
+  public get selectedVersionObject(): CatalogEntry {
+    console.log(this.selectedVersion.value);
+    return this.selectedVersion.value as CatalogEntry;
+  }
 
   private subscriptions: Subscription[] = [];
 
@@ -32,7 +38,7 @@ export class PackageDetailsComponent implements OnInit {
   }
 
   public install(): void {
-    this.packageManager.installPackage(this.package, this.selectedVersion.value);
+    this.packageManager.installPackage(this.package, this.selectedVersionObject.version);
   }
 
   public uninstall(): void {
@@ -42,12 +48,11 @@ export class PackageDetailsComponent implements OnInit {
   private listenForCurrentPackage(): void {
     this.subscriptions.push(
       this.packageManager.currentSelectedPackage.subscribe((selectedPackage) => {
-        if (!selectedPackage) {
-          this.package = null;
-        }
+        console.log('Current Package: ', selectedPackage);
         this.package = selectedPackage;
         if (this.package) {
-          this.selectedVersion.setValue(this.package.versions[0].version);
+          // we will make sure to load versions before getting here
+          this.selectedVersion.setValue(this.package.versions![0]);
         }
       })
     );

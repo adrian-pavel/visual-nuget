@@ -1,8 +1,11 @@
-import { PackageDetailsSearchResult } from './search-results';
+import { CatalogEntry } from './package-meta';
+import { PackageSearchResult } from './search-results';
 
-export interface PackageDetailsModel extends PackageDetailsSearchResult {
+export interface PackageRowModel extends PackageSearchResult {
   installedVersion: string;
   isInstalled: boolean;
   isOutdated: boolean;
   sourceUrl: string;
+
+  versions: CatalogEntry[] | undefined;
 }

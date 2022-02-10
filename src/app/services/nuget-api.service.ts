@@ -4,9 +4,10 @@ import { catchError, EMPTY, forkJoin, map, Observable, of, switchMap } from 'rxj
 import { coerce, prerelease, rcompare } from 'semver';
 
 import { ApiIndexResponse } from '../models/api-index-response';
+import { PackageRowModel } from '../models/package-details';
 import { CatalogEntry, PackageMetaResponse } from '../models/package-meta';
 import { PackageSource } from '../models/package-source';
-import { PackageDetailsSearchResult, SearchResults, Version } from '../models/search-results';
+import { PackageSearchResult, SearchResults, Version } from '../models/search-results';
 
 @Injectable({
   providedIn: 'root',
@@ -33,7 +34,7 @@ export class NuGetApiService {
 
   constructor(private http: HttpClient) {}
 
-  public search(query: string, prerelease: boolean, source: PackageSource): Observable<SearchResults> {
+  public search(query: string, prerelease: boolean, source: PackageSource): Observable<PackageRowModel[]> {
     let authHeaders = new HttpHeaders();
     if (source.authorizationHeader) {
       authHeaders = authHeaders.append('authorization', source.authorizationHeader);
@@ -44,12 +45,12 @@ export class NuGetApiService {
         return this.executeSearch(query, prerelease, searchApiUrl, authHeaders);
       }),
       map((results) => {
-        return this.sortVersionsOnResults(results);
+        return this.mapSearchResultsToPackageRows(results.data, source);
       })
     );
   }
 
-  public searchByPackageIds(packageIds: string[], query: string, includePrerelease: boolean, source: PackageSource): Observable<SearchResults> {
+  public searchByPackageIds(packageIds: string[], query: string, prerelease: boolean, source: PackageSource): Observable<PackageRowModel[]> {
     let authHeaders = new HttpHeaders();
     if (source.authorizationHeader) {
       authHeaders = authHeaders.append('authorization', source.authorizationHeader);
@@ -57,12 +58,12 @@ export class NuGetApiService {
 
     return this.getApiUrl(source, authHeaders, this.registrationsBaseUrlEndpoints).pipe(
       switchMap((metaApiUrl) => {
-        return this.executeMetadataGets(packageIds, query, includePrerelease, metaApiUrl, authHeaders);
+        return this.executeMetadataGets(packageIds, query, prerelease, metaApiUrl, authHeaders);
       })
     );
   }
 
-  private executeSearch(query: string, prerelease: boolean, searchApiUrl: string, authHeaders: HttpHeaders) {
+  private executeSearch(query: string, prerelease: boolean, searchApiUrl: string, authHeaders: HttpHeaders): Observable<SearchResults> {
     const searchParams = {
       q: query,
       prerelease: prerelease,
@@ -78,10 +79,10 @@ export class NuGetApiService {
   private executeMetadataGets(
     packageIds: string[],
     query: string,
-    includePrerelease: boolean,
+    prerelease: boolean,
     metaApiUrl: string,
     authHeaders: HttpHeaders
-  ): Observable<SearchResults> {
+  ): Observable<PackageRowModel[]> {
     const requests: Observable<PackageMetaResponse | null>[] = [];
 
     // compose a list of requests to start in parallel
@@ -99,20 +100,11 @@ export class NuGetApiService {
 
     return forkJoin(requests).pipe(
       map((multiResults) => {
-        let mergedResults: SearchResults = {
-          totalHits: 0,
-          data: [],
-        };
-
-        const detailsSearchResults = multiResults.map((meta, index) =>
-          this.convertMetaToDetailsSearchResult(meta, packageIds[index], includePrerelease)
-        );
+        const detailsSearchResults = multiResults.map((meta, index) => this.convertMetaToPackageRow(meta, packageIds[index], prerelease));
 
         // filter out the null results for packages that don't exist on this source
         // also filter based on the query in the same pass
-        const filteredSearchResults = detailsSearchResults.filter((result) =>
-          this.filterResultsByQuery(query, result)
-        ) as PackageDetailsSearchResult[];
+        const filteredSearchResults = detailsSearchResults.filter((result) => this.filterResultsByQuery(query, result)) as PackageRowModel[];
 
         // sort the results alphabetically
         filteredSearchResults.sort((a, b) => {
@@ -125,15 +117,12 @@ export class NuGetApiService {
           return 0;
         });
 
-        mergedResults.data = filteredSearchResults;
-        mergedResults.totalHits = filteredSearchResults.length;
-
-        return mergedResults;
+        return filteredSearchResults;
       })
     );
   }
 
-  private filterResultsByQuery(query: string, result: PackageDetailsSearchResult | null): boolean {
+  private filterResultsByQuery(query: string, result: PackageSearchResult | null): boolean {
     if (result === null) {
       return false;
     }
@@ -147,11 +136,7 @@ export class NuGetApiService {
     return result.id.toLocaleLowerCase().includes(lowerQuery) || result.description.toLowerCase().includes(lowerQuery);
   }
 
-  private convertMetaToDetailsSearchResult(
-    packageMeta: PackageMetaResponse | null,
-    packageId: string,
-    includePrerelease: boolean
-  ): PackageDetailsSearchResult | null {
+  private convertMetaToPackageRow(packageMeta: PackageMetaResponse | null, packageId: string, includePrerelease: boolean): PackageRowModel | null {
     if (packageMeta === null) {
       return null;
     }
@@ -176,28 +161,23 @@ export class NuGetApiService {
     });
 
     const latestCatalogEntry = allCatalogEntries[0];
-    const versions = allCatalogEntries.map((entry) => {
-      const version: Version = {
-        '@id': 'Replace this',
-        downloads: 0,
-        version: entry.version,
-      };
-      return version;
-    });
 
-    return {
+    const packageRow: PackageRowModel = {
       id: packageId,
       version: latestCatalogEntry.version,
       description: latestCatalogEntry.description,
-      versions: versions,
       authors: latestCatalogEntry.authors,
       iconUrl: latestCatalogEntry.iconUrl,
-      licenseUrl: latestCatalogEntry.licenseUrl,
-      projectUrl: latestCatalogEntry.projectUrl,
-      tags: latestCatalogEntry.tags,
       totalDownloads: 0,
       verified: false,
+      isInstalled: false,
+      installedVersion: '',
+      isOutdated: false,
+      sourceUrl: '',
+      versions: allCatalogEntries,
     };
+
+    return packageRow;
   }
 
   private getApiUrl(source: PackageSource, authHeaders: HttpHeaders, preferedEndpoints: string[]): Observable<string> {
@@ -221,11 +201,11 @@ export class NuGetApiService {
   }
 
   private sortVersionsOnResults(results: SearchResults) {
-    results.data.forEach((pdsr) =>
-      pdsr.versions.sort((v1: Version, v2: Version) => {
-        return this.compareSemVers(v1.version, v2.version);
-      })
-    );
+    // results.data.forEach((pdsr) =>
+    //   pdsr.versions.sort((v1: Version, v2: Version) => {
+    //     return this.compareSemVers(v1.version, v2.version);
+    //   })
+    // );
     return results;
   }
 
@@ -240,5 +220,25 @@ export class NuGetApiService {
       }
       return rcompare(cleanV1, cleanV2, { includePrerelease: true, loose: true });
     }
+  }
+
+  private mapSearchResultsToPackageRows(
+    packageSearchResults: PackageSearchResult[],
+    source: PackageSource,
+    versions: CatalogEntry[] | undefined = undefined
+  ): PackageRowModel[] {
+    const packagesWithInstalledInfo = packageSearchResults.map((psr) => {
+      const pdm: PackageRowModel = {
+        ...psr,
+        isInstalled: false,
+        installedVersion: '',
+        isOutdated: false,
+        sourceUrl: source.url,
+        versions: versions,
+      };
+      return pdm;
+    });
+
+    return packagesWithInstalledInfo;
   }
 }
