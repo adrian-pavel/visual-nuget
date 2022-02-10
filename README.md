@@ -2,7 +2,15 @@
 
 A visual NuGet package manager. Search for, install and uninstall NuGet packages.
 
-**Need to have dotnet installed. The extension forwards the commands to the dotnet cli.**
+### **Need to have dotnet installed. The extension forwards the commands to the dotnet cli.**
+
+### Known issues and missing features
+
+1. Github NuGet registry not supported properly yet. Others probably as well.
+2. Some private servers do not display packages on the "Installed" and "Updates" tabs.
+3. Lazy loading more results not implemented yet.
+4. Package details not loading based on selected version
+5. Package details does not show dependencies
 
 ## How to use
 
@@ -33,11 +41,13 @@ With the created PAT base64 encode a string of the following format: VssSessionT
 Compose the **authorizationHeader** like so: "Basic MyBase64EncodedString". It should look something like this: "Basic VnNzU2Vzc2lvblRva2VuOk15TmV3bHlDcmVhdGVkUEFU".  
 Use this string when defining the source in the Settings.
 
-## Known issues
+## Release notes
 
-1. Github NuGet registry not supported properly yet. Others probably as well.
-2. Some private servers do not display packages on the "Installed" and "Updates" tabs.
-3. Lazy loading more results not implemented yet.
+### v0.0.5
+
+- semver sorting
+- fixed installed/updates tabs for private repos, hope it works for all now
+- added status icons on search results showing installed/outdated status
 
 ## Any questions or issues?
 
