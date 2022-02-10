@@ -49,7 +49,7 @@ export class NuGetApiService {
     );
   }
 
-  public searchByPackageIds(packageIds: string[], source: PackageSource): Observable<SearchResults> {
+  public searchByPackageIds(packageIds: string[], query: string, source: PackageSource): Observable<SearchResults> {
     let authHeaders = new HttpHeaders();
     if (source.authorizationHeader) {
       authHeaders = authHeaders.append('authorization', source.authorizationHeader);
@@ -57,7 +57,7 @@ export class NuGetApiService {
 
     return this.getApiUrl(source, authHeaders, this.registrationsBaseUrlEndpoints).pipe(
       switchMap((metaApiUrl) => {
-        return this.executeMetadataGets(packageIds, metaApiUrl, authHeaders);
+        return this.executeMetadataGets(packageIds, query, metaApiUrl, authHeaders);
       })
     );
   }
@@ -75,7 +75,7 @@ export class NuGetApiService {
     });
   }
 
-  private executeMetadataGets(packageIds: string[], metaApiUrl: string, authHeaders: HttpHeaders): Observable<SearchResults> {
+  private executeMetadataGets(packageIds: string[], query: string, metaApiUrl: string, authHeaders: HttpHeaders): Observable<SearchResults> {
     const requests: Observable<PackageMetaResponse | null>[] = [];
 
     // compose a list of requests to start in parallel
@@ -101,7 +101,10 @@ export class NuGetApiService {
         const detailsSearchResults = multiResults.map((meta, index) => this.convertMetaToDetailsSearchResult(meta, packageIds[index]));
 
         // filter out the null results for packages that don't exist on this source
-        const filteredSearchResults = detailsSearchResults.filter((x) => x !== null) as PackageDetailsSearchResult[];
+        // also filter based on the query in the same pass
+        const filteredSearchResults = detailsSearchResults.filter((result) =>
+          this.filterResultsByQuery(query, result)
+        ) as PackageDetailsSearchResult[];
 
         // sort the results alphabetically
         filteredSearchResults.sort((a, b) => {
@@ -120,6 +123,20 @@ export class NuGetApiService {
         return mergedResults;
       })
     );
+  }
+
+  private filterResultsByQuery(query: string, result: PackageDetailsSearchResult | null): boolean {
+    if (result === null) {
+      return false;
+    }
+
+    if (!query.trim()) {
+      return true;
+    }
+
+    const lowerQuery = query.toLocaleLowerCase();
+
+    return result.id.toLocaleLowerCase().includes(lowerQuery) || result.description.toLowerCase().includes(lowerQuery);
   }
 
   private convertMetaToDetailsSearchResult(packageMeta: PackageMetaResponse | null, packageId: string): PackageDetailsSearchResult | null {

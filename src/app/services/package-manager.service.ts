@@ -66,7 +66,7 @@ export class PackageManagerService {
       });
     } else {
       const currentInstalledPackageIds = this.getCurrentInstalledPackageIds();
-      this.nugetService.searchByPackageIds(currentInstalledPackageIds, source).subscribe((results: SearchResults) => {
+      this.nugetService.searchByPackageIds(currentInstalledPackageIds, query, source).subscribe((results: SearchResults) => {
         let packageDetailModels = this.mapSearchResultsToPackageDetails(results.data, source);
         this.setInstalledInformation(packageDetailModels);
         packageDetailModels = this.filterResultsToMatchCategory(packageDetailModels);
