@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, EMPTY, forkJoin, map, Observable, of, switchMap } from 'rxjs';
-import { coerce, rcompare } from 'semver';
+import { coerce, prerelease, rcompare } from 'semver';
 
 import { ApiIndexResponse } from '../models/api-index-response';
 import { CatalogEntry, PackageMetaResponse } from '../models/package-meta';
@@ -49,7 +49,7 @@ export class NuGetApiService {
     );
   }
 
-  public searchByPackageIds(packageIds: string[], query: string, source: PackageSource): Observable<SearchResults> {
+  public searchByPackageIds(packageIds: string[], query: string, includePrerelease: boolean, source: PackageSource): Observable<SearchResults> {
     let authHeaders = new HttpHeaders();
     if (source.authorizationHeader) {
       authHeaders = authHeaders.append('authorization', source.authorizationHeader);
@@ -57,7 +57,7 @@ export class NuGetApiService {
 
     return this.getApiUrl(source, authHeaders, this.registrationsBaseUrlEndpoints).pipe(
       switchMap((metaApiUrl) => {
-        return this.executeMetadataGets(packageIds, query, metaApiUrl, authHeaders);
+        return this.executeMetadataGets(packageIds, query, includePrerelease, metaApiUrl, authHeaders);
       })
     );
   }
@@ -75,7 +75,13 @@ export class NuGetApiService {
     });
   }
 
-  private executeMetadataGets(packageIds: string[], query: string, metaApiUrl: string, authHeaders: HttpHeaders): Observable<SearchResults> {
+  private executeMetadataGets(
+    packageIds: string[],
+    query: string,
+    includePrerelease: boolean,
+    metaApiUrl: string,
+    authHeaders: HttpHeaders
+  ): Observable<SearchResults> {
     const requests: Observable<PackageMetaResponse | null>[] = [];
 
     // compose a list of requests to start in parallel
@@ -98,7 +104,9 @@ export class NuGetApiService {
           data: [],
         };
 
-        const detailsSearchResults = multiResults.map((meta, index) => this.convertMetaToDetailsSearchResult(meta, packageIds[index]));
+        const detailsSearchResults = multiResults.map((meta, index) =>
+          this.convertMetaToDetailsSearchResult(meta, packageIds[index], includePrerelease)
+        );
 
         // filter out the null results for packages that don't exist on this source
         // also filter based on the query in the same pass
@@ -139,7 +147,11 @@ export class NuGetApiService {
     return result.id.toLocaleLowerCase().includes(lowerQuery) || result.description.toLowerCase().includes(lowerQuery);
   }
 
-  private convertMetaToDetailsSearchResult(packageMeta: PackageMetaResponse | null, packageId: string): PackageDetailsSearchResult | null {
+  private convertMetaToDetailsSearchResult(
+    packageMeta: PackageMetaResponse | null,
+    packageId: string,
+    includePrerelease: boolean
+  ): PackageDetailsSearchResult | null {
     if (packageMeta === null) {
       return null;
     }
@@ -149,7 +161,10 @@ export class NuGetApiService {
     for (const page of packageMeta.items) {
       if (page.items) {
         for (const leaf of page.items) {
-          allCatalogEntries.push(leaf.catalogEntry);
+          // if includePrerelease === true then include all versions else only include stable ones
+          if (includePrerelease || prerelease(leaf.catalogEntry.version) === null) {
+            allCatalogEntries.push(leaf.catalogEntry);
+          }
         }
       } else {
         // TODO: fetch the page using the page[@id]
