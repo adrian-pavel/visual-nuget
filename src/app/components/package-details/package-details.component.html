@@ -48,6 +48,7 @@
         <span class="label">Tags:</span>
         <span class="content">{{ selectedVersionObject.tags }}</span>
       </div>
+      <app-package-details-dependencies [dependencyGroups]="selectedVersionObject.dependencyGroups"></app-package-details-dependencies>
     </div>
   </ng-container>
 </div>

@@ -13,9 +13,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
+import { PackageDetailsDependenciesComponent } from './components/package-details-dependencies/package-details-dependencies.component';
 
 @NgModule({
-  declarations: [AppComponent, NavBarComponent, ToolBarComponent, PackageRowComponent, PackageListComponent, PackageDetailsComponent, ShortNumberPipe, LoadingSpinnerComponent],
+  declarations: [AppComponent, NavBarComponent, ToolBarComponent, PackageRowComponent, PackageListComponent, PackageDetailsComponent, ShortNumberPipe, LoadingSpinnerComponent, PackageDetailsDependenciesComponent],
   imports: [BrowserModule, HttpClientModule, ReactiveFormsModule, FontAwesomeModule],
   providers: [],
   bootstrap: [AppComponent],
