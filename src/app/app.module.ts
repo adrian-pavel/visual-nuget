@@ -14,9 +14,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 import { PackageDetailsDependenciesComponent } from './components/package-details-dependencies/package-details-dependencies.component';
+import { VersionRangePipe } from './pipes/version-range.pipe';
 
 @NgModule({
-  declarations: [AppComponent, NavBarComponent, ToolBarComponent, PackageRowComponent, PackageListComponent, PackageDetailsComponent, ShortNumberPipe, LoadingSpinnerComponent, PackageDetailsDependenciesComponent],
+  declarations: [AppComponent, NavBarComponent, ToolBarComponent, PackageRowComponent, PackageListComponent, PackageDetailsComponent, ShortNumberPipe, LoadingSpinnerComponent, PackageDetailsDependenciesComponent, VersionRangePipe],
   imports: [BrowserModule, HttpClientModule, ReactiveFormsModule, FontAwesomeModule],
   providers: [],
   bootstrap: [AppComponent],

@@ -5,7 +5,7 @@
     <ng-container *ngIf="dependencyGroup.dependencies?.length; else noDependencies">
       <div *ngFor="let dependency of dependencyGroup.dependencies" class="dependency">
         <span class="id">{{ dependency.id }}</span>
-        <span class="range">{{ dependency.range }}</span>
+        <span class="range">{{ dependency.range | versionRange }}</span>
       </div>
     </ng-container>
     <ng-template #noDependencies class="no-dependencies">
