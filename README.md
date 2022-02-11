@@ -7,10 +7,7 @@ A visual NuGet package manager. Search for, install and uninstall NuGet packages
 ### Known issues and missing features
 
 1. Github NuGet registry not supported properly yet. Others probably as well.
-2. Some private servers do not display packages on the "Installed" and "Updates" tabs.
-3. Lazy loading more results not implemented yet.
-4. Package details not loading based on selected version
-5. Package details does not show dependencies
+2. Lazy loading more results not implemented yet.
 
 ## How to use
 
@@ -42,6 +39,13 @@ Compose the **authorizationHeader** like so: "Basic MyBase64EncodedString". It s
 Use this string when defining the source in the Settings.
 
 ## Release notes
+
+### v0.1.0
+
+- load metadata for each version
+- display version dependencies and published date
+- fixed metadata loading for packages with hundreds of versions
+- added loading animation to the package list view
 
 ### v0.0.5
 
