@@ -80,7 +80,6 @@ export class PackageManagerService {
       this.nugetService.searchByPackageIds(currentInstalledPackageIds, query, prerelease, source).subscribe((packageRowModels: PackageRowModel[]) => {
         this.setInstalledInformation(packageRowModels);
         packageRowModels = this.filterResultsToMatchCategory(packageRowModels);
-        console.log(packageRowModels);
         this._currentPackages.next(packageRowModels);
       });
     }

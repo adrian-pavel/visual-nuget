@@ -4,6 +4,8 @@
   align-items: center;
   height: 100%;
 
+  $cell-size: 16px;
+
   .lds-grid {
     display: inline-block;
     position: relative;
@@ -12,9 +14,8 @@
 
     div {
       position: absolute;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
+      width: $cell-size;
+      height: $cell-size;
       background: var(--vscode-button-background);
       animation: lds-grid 1.2s linear infinite;
 
@@ -72,13 +73,14 @@
       }
     }
   }
-}
-@keyframes lds-grid {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
+
+  @keyframes lds-grid {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
   }
 }

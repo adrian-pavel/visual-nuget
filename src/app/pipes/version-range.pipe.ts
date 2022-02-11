@@ -14,8 +14,6 @@ export class VersionRangePipe implements PipeTransform {
 
     const versions = remaining.split(',');
 
-    console.log('Versions:', versions);
-
     const minVersion = versions[0].trim();
     const maxVersion = versions[1].trim();
 
