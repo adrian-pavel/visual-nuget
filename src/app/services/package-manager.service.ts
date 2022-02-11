@@ -77,11 +77,17 @@ export class PackageManagerService {
       });
     } else {
       const currentInstalledPackageIds = this.getCurrentInstalledPackageIds();
-      this.nugetService.searchByPackageIds(currentInstalledPackageIds, query, prerelease, source).subscribe((packageRowModels: PackageRowModel[]) => {
-        this.setInstalledInformation(packageRowModels);
-        packageRowModels = this.filterResultsToMatchCategory(packageRowModels);
-        this._currentPackages.next(packageRowModels);
-      });
+      if (currentInstalledPackageIds.length) {
+        this.nugetService
+          .searchByPackageIds(currentInstalledPackageIds, query, prerelease, source)
+          .subscribe((packageRowModels: PackageRowModel[]) => {
+            this.setInstalledInformation(packageRowModels);
+            packageRowModels = this.filterResultsToMatchCategory(packageRowModels);
+            this._currentPackages.next(packageRowModels);
+          });
+      } else {
+        this._currentPackages.next([]);
+      }
     }
   }
 
@@ -90,7 +96,7 @@ export class PackageManagerService {
     this._currentInstalledPackages.next(project.packages);
 
     const currentPackages = this._currentPackages.value;
-    if (currentPackages) {
+    if (currentPackages && project.packages.length) {
       this.setInstalledInformation(currentPackages);
     }
   }
