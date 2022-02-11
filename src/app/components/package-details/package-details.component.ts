@@ -46,7 +46,7 @@ export class PackageDetailsComponent implements OnInit {
 
   private listenForCurrentPackage(): void {
     this.subscriptions.push(
-      this.packageManager.currentSelectedPackage.subscribe((selectedPackage) => {
+      this.packageManager.currentSelectedPackage.subscribe((selectedPackage: PackageRowModel | null) => {
         console.log('Current Package: ', selectedPackage);
         this.package = selectedPackage;
         if (this.package) {
