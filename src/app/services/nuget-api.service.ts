@@ -1,12 +1,13 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, EMPTY, forkJoin, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { coerce, prerelease, rcompare } from 'semver';
 
 import { ApiIndexResponse } from '../models/api-index-response';
-import { CatalogEntry, PackageMetaResponse } from '../models/package-meta';
+import { PackageRowModel } from '../models/package-details';
+import { CatalogEntry, PackageMetaResponse, RegistrationLeaf, RegistrationPage } from '../models/package-meta';
 import { PackageSource } from '../models/package-source';
-import { PackageDetailsSearchResult, SearchResults, Version } from '../models/search-results';
+import { PackageSearchResult, SearchResults } from '../models/search-results';
 
 @Injectable({
   providedIn: 'root',
@@ -33,7 +34,7 @@ export class NuGetApiService {
 
   constructor(private http: HttpClient) {}
 
-  public search(query: string, prerelease: boolean, source: PackageSource): Observable<SearchResults> {
+  public search(query: string, prerelease: boolean, source: PackageSource): Observable<PackageRowModel[]> {
     let authHeaders = new HttpHeaders();
     if (source.authorizationHeader) {
       authHeaders = authHeaders.append('authorization', source.authorizationHeader);
@@ -44,12 +45,12 @@ export class NuGetApiService {
         return this.executeSearch(query, prerelease, searchApiUrl, authHeaders);
       }),
       map((results) => {
-        return this.sortVersionsOnResults(results);
+        return this.mapSearchResultsToPackageRows(results.data, source);
       })
     );
   }
 
-  public searchByPackageIds(packageIds: string[], query: string, includePrerelease: boolean, source: PackageSource): Observable<SearchResults> {
+  public searchByPackageIds(packageIds: string[], query: string, prerelease: boolean, source: PackageSource): Observable<PackageRowModel[]> {
     let authHeaders = new HttpHeaders();
     if (source.authorizationHeader) {
       authHeaders = authHeaders.append('authorization', source.authorizationHeader);
@@ -57,12 +58,12 @@ export class NuGetApiService {
 
     return this.getApiUrl(source, authHeaders, this.registrationsBaseUrlEndpoints).pipe(
       switchMap((metaApiUrl) => {
-        return this.executeMetadataGets(packageIds, query, includePrerelease, metaApiUrl, authHeaders);
+        return this.executeMetadataGets(packageIds, query, prerelease, metaApiUrl, authHeaders, source.url);
       })
     );
   }
 
-  private executeSearch(query: string, prerelease: boolean, searchApiUrl: string, authHeaders: HttpHeaders) {
+  private executeSearch(query: string, prerelease: boolean, searchApiUrl: string, authHeaders: HttpHeaders): Observable<SearchResults> {
     const searchParams = {
       q: query,
       prerelease: prerelease,
@@ -80,60 +81,138 @@ export class NuGetApiService {
     query: string,
     includePrerelease: boolean,
     metaApiUrl: string,
-    authHeaders: HttpHeaders
-  ): Observable<SearchResults> {
-    const requests: Observable<PackageMetaResponse | null>[] = [];
+    authHeaders: HttpHeaders,
+    sourceUrl: string
+  ): Observable<PackageRowModel[]> {
+    const requests: Observable<PackageRowModel | null>[] = [];
 
     // compose a list of requests to start in parallel
     for (const packageId of packageIds) {
       const metaApiFullUrl = new URL(`${packageId.toLowerCase()}/index.json`, metaApiUrl);
 
-      const request = this.http
+      const request: Observable<PackageRowModel | null> = this.http
         .get<PackageMetaResponse>(metaApiFullUrl.toString(), {
           headers: authHeaders,
         })
         //some packages will not exist on some source, for these return null and filter after
-        .pipe(catchError((_) => of(null)));
+        .pipe(
+          catchError((_) => of(null)),
+          switchMap((packageMeta: PackageMetaResponse | null): Observable<RegistrationLeaf[] | null> => {
+            return this.getRegistrationLeafs(packageMeta);
+          }),
+          map((registrationLeafs: RegistrationLeaf[] | null): CatalogEntry[] | null => {
+            return this.getFilteredAndSortedCatalogEntries(registrationLeafs, includePrerelease);
+          }),
+          map((catalogEntries: CatalogEntry[] | null) => {
+            return this.convertCatalogEntriesToPackageRow(catalogEntries, packageId, sourceUrl);
+          })
+        );
       requests.push(request);
     }
 
     return forkJoin(requests).pipe(
-      map((multiResults) => {
-        let mergedResults: SearchResults = {
-          totalHits: 0,
-          data: [],
-        };
-
-        const detailsSearchResults = multiResults.map((meta, index) =>
-          this.convertMetaToDetailsSearchResult(meta, packageIds[index], includePrerelease)
-        );
-
-        // filter out the null results for packages that don't exist on this source
-        // also filter based on the query in the same pass
-        const filteredSearchResults = detailsSearchResults.filter((result) =>
-          this.filterResultsByQuery(query, result)
-        ) as PackageDetailsSearchResult[];
-
-        // sort the results alphabetically
-        filteredSearchResults.sort((a, b) => {
-          if (a.id < b.id) {
-            return -1;
-          }
-          if (a.id > b.id) {
-            return 1;
-          }
-          return 0;
-        });
-
-        mergedResults.data = filteredSearchResults;
-        mergedResults.totalHits = filteredSearchResults.length;
-
-        return mergedResults;
+      map((packageRowResults) => {
+        return this.filterAndSortPackageRowResults(packageRowResults, query);
       })
     );
   }
 
-  private filterResultsByQuery(query: string, result: PackageDetailsSearchResult | null): boolean {
+  private getRegistrationLeafs(packageMeta: PackageMetaResponse | null): Observable<RegistrationLeaf[] | null> {
+    if (packageMeta === null) {
+      return of(null);
+    }
+
+    const allLeafsRequests: Observable<RegistrationLeaf[]>[] = [];
+
+    for (const page of packageMeta.items) {
+      if (page.items) {
+        allLeafsRequests.push(of(page.items));
+      } else {
+        // need to fetch each page on an individual request to the API
+        const regPageRequest = this.http
+          .get<RegistrationPage>(page['@id'])
+          .pipe(map((registrationPage: RegistrationPage) => registrationPage.items!));
+        allLeafsRequests.push(regPageRequest);
+      }
+    }
+
+    return forkJoin(allLeafsRequests).pipe(
+      map((results) => {
+        let finalResult: RegistrationLeaf[] = [];
+        results.forEach((result) => {
+          finalResult = finalResult.concat(result);
+        });
+        return finalResult;
+      })
+    );
+  }
+
+  private getFilteredAndSortedCatalogEntries(registrationLeafs: RegistrationLeaf[] | null, includePrerelease: boolean): CatalogEntry[] | null {
+    if (registrationLeafs === null) {
+      return null;
+    }
+
+    let filteredRegistrationLeafs: RegistrationLeaf[] = [];
+    if (includePrerelease) {
+      filteredRegistrationLeafs = registrationLeafs;
+    } else {
+      filteredRegistrationLeafs = registrationLeafs.filter((rl) => prerelease(rl.catalogEntry.version) === null);
+    }
+
+    const allCatalogEntries = filteredRegistrationLeafs.map((rl) => rl.catalogEntry);
+
+    allCatalogEntries.sort((entry1, entry2) => {
+      return this.compareSemVers(entry1.version, entry2.version);
+    });
+
+    return allCatalogEntries;
+  }
+
+  private convertCatalogEntriesToPackageRow(catalogEntries: CatalogEntry[] | null, packageId: string, sourceUrl: string): PackageRowModel | null {
+    if (catalogEntries === null) {
+      return null;
+    }
+
+    const latestCatalogEntry = catalogEntries[0];
+
+    const packageRow: PackageRowModel = {
+      id: packageId,
+      version: latestCatalogEntry.version,
+      description: latestCatalogEntry.description,
+      authors: latestCatalogEntry.authors,
+      iconUrl: latestCatalogEntry.iconUrl,
+      totalDownloads: undefined,
+      verified: false,
+      isInstalled: false,
+      installedVersion: '',
+      isOutdated: false,
+      sourceUrl: sourceUrl,
+      versions: catalogEntries,
+    };
+
+    return packageRow;
+  }
+
+  private filterAndSortPackageRowResults(packageRowResults: (PackageRowModel | null)[], query: string): PackageRowModel[] {
+    // filter out the null results for packages that don't exist on this source
+    // also filter based on the query in the same pass
+    const filteredSearchResults = packageRowResults.filter((result) => this.resultMatchesQuery(query, result)) as PackageRowModel[];
+
+    // sort the results alphabetically
+    filteredSearchResults.sort((a, b) => {
+      if (a.id < b.id) {
+        return -1;
+      }
+      if (a.id > b.id) {
+        return 1;
+      }
+      return 0;
+    });
+
+    return filteredSearchResults;
+  }
+
+  private resultMatchesQuery(query: string, result: PackageSearchResult | null): boolean {
     if (result === null) {
       return false;
     }
@@ -145,59 +224,6 @@ export class NuGetApiService {
     const lowerQuery = query.toLocaleLowerCase();
 
     return result.id.toLocaleLowerCase().includes(lowerQuery) || result.description.toLowerCase().includes(lowerQuery);
-  }
-
-  private convertMetaToDetailsSearchResult(
-    packageMeta: PackageMetaResponse | null,
-    packageId: string,
-    includePrerelease: boolean
-  ): PackageDetailsSearchResult | null {
-    if (packageMeta === null) {
-      return null;
-    }
-
-    const allCatalogEntries: CatalogEntry[] = [];
-
-    for (const page of packageMeta.items) {
-      if (page.items) {
-        for (const leaf of page.items) {
-          // if includePrerelease === true then include all versions else only include stable ones
-          if (includePrerelease || prerelease(leaf.catalogEntry.version) === null) {
-            allCatalogEntries.push(leaf.catalogEntry);
-          }
-        }
-      } else {
-        // TODO: fetch the page using the page[@id]
-      }
-    }
-
-    allCatalogEntries.sort((entry1, entry2) => {
-      return this.compareSemVers(entry1.version, entry2.version);
-    });
-
-    const latestCatalogEntry = allCatalogEntries[0];
-    const versions = allCatalogEntries.map((entry) => {
-      const version: Version = {
-        '@id': 'Replace this',
-        downloads: 0,
-        version: entry.version,
-      };
-      return version;
-    });
-
-    return {
-      id: packageId,
-      version: latestCatalogEntry.version,
-      description: latestCatalogEntry.description,
-      versions: versions,
-      authors: latestCatalogEntry.authors,
-      iconUrl: latestCatalogEntry.iconUrl,
-      licenseUrl: latestCatalogEntry.licenseUrl,
-      projectUrl: latestCatalogEntry.projectUrl,
-      tags: latestCatalogEntry.tags,
-      totalDownloads: 0,
-      verified: false,
-    };
   }
 
   private getApiUrl(source: PackageSource, authHeaders: HttpHeaders, preferedEndpoints: string[]): Observable<string> {
@@ -220,15 +246,6 @@ export class NuGetApiService {
       );
   }
 
-  private sortVersionsOnResults(results: SearchResults) {
-    results.data.forEach((pdsr) =>
-      pdsr.versions.sort((v1: Version, v2: Version) => {
-        return this.compareSemVers(v1.version, v2.version);
-      })
-    );
-    return results;
-  }
-
   private compareSemVers(v1: string, v2: string) {
     try {
       return rcompare(v1, v2, { includePrerelease: true, loose: true });
@@ -240,5 +257,25 @@ export class NuGetApiService {
       }
       return rcompare(cleanV1, cleanV2, { includePrerelease: true, loose: true });
     }
+  }
+
+  private mapSearchResultsToPackageRows(
+    packageSearchResults: PackageSearchResult[],
+    source: PackageSource,
+    versions: CatalogEntry[] | undefined = undefined
+  ): PackageRowModel[] {
+    const packagesWithInstalledInfo = packageSearchResults.map((psr) => {
+      const pdm: PackageRowModel = {
+        ...psr,
+        isInstalled: false,
+        installedVersion: '',
+        isOutdated: false,
+        sourceUrl: source.url,
+        versions: versions,
+      };
+      return pdm;
+    });
+
+    return packagesWithInstalledInfo;
   }
 }

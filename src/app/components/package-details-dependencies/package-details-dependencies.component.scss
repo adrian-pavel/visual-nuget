@@ -1,0 +1,21 @@
+.dependencies-container {
+  .label {
+    font-size: 0.75rem;
+    font-weight: bold;
+  }
+
+  $indentation: 1rem;
+
+  .group-name {
+    margin-left: $indentation;
+    font-weight: 500;
+    margin-top: 0.5rem;
+  }
+  .dependency {
+    margin-left: calc(2 * $indentation);
+
+    .id {
+      margin-right: 0.5rem;
+    }
+  }
+}

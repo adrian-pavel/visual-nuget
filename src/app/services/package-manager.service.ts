@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Category } from '../models/category';
-import { PackageDetailsModel } from '../models/package-details';
+import { PackageRowModel } from '../models/package-details';
 import { PackageSource } from '../models/package-source';
 import { Package, Project } from '../models/project';
-import { PackageDetailsSearchResult, SearchResults } from '../models/search-results';
+import { PackageSearchResult, SearchResults } from '../models/search-results';
 import { NuGetApiService } from './nuget-api.service';
 
 declare function acquireVsCodeApi(): any;
@@ -29,8 +29,8 @@ export class PackageManagerService {
     return this._currentProjectName.asObservable();
   }
 
-  private _currentPackages = new BehaviorSubject<PackageDetailsModel[] | null>(null);
-  public get currentPackages(): Observable<PackageDetailsModel[] | null> {
+  private _currentPackages = new BehaviorSubject<PackageRowModel[] | null>(null);
+  public get currentPackages(): Observable<PackageRowModel[] | null> {
     return this._currentPackages.asObservable();
   }
 
@@ -39,10 +39,18 @@ export class PackageManagerService {
     return this._currentInstalledPackages.asObservable();
   }
 
-  private _currentSelectedPackage = new BehaviorSubject<PackageDetailsModel | null>(null);
-  public get currentSelectedPackage(): Observable<PackageDetailsModel | null> {
+  private _currentSelectedPackage = new BehaviorSubject<PackageRowModel | null>(null);
+  public get currentSelectedPackage(): Observable<PackageRowModel | null> {
     return this._currentSelectedPackage.asObservable();
   }
+
+  private _currentSelectedPackageId = new BehaviorSubject<string | null>(null);
+  public get currentSelectedPackageId(): Observable<string | null> {
+    return this._currentSelectedPackageId.asObservable();
+  }
+
+  private _currentSource: PackageSource | null = null;
+  private _currentPrerelease: boolean = false;
 
   constructor(private nugetService: NuGetApiService) {
     // tell the extension to load the project and it's installed packages
@@ -54,24 +62,25 @@ export class PackageManagerService {
 
   public queryForPackages(query: string, prerelease: boolean, source: PackageSource): void {
     this._currentSelectedPackage.next(null);
+    this._currentSelectedPackageId.next(null);
     this._currentPackages.next(null);
+
+    this._currentSource = source;
+    this._currentPrerelease = prerelease;
 
     const currentCategory = this._currentCategory.value;
 
     if (currentCategory === Category.Browse) {
-      this.nugetService.search(query, prerelease, source).subscribe((results: SearchResults) => {
-        let packageDetailModels = this.mapSearchResultsToPackageDetails(results.data, source);
-        this.setInstalledInformation(packageDetailModels);
-        this._currentPackages.next(packageDetailModels);
+      this.nugetService.search(query, prerelease, source).subscribe((packageRowModels: PackageRowModel[]) => {
+        this.setInstalledInformation(packageRowModels);
+        this._currentPackages.next(packageRowModels);
       });
     } else {
       const currentInstalledPackageIds = this.getCurrentInstalledPackageIds();
-      this.nugetService.searchByPackageIds(currentInstalledPackageIds, query, prerelease, source).subscribe((results: SearchResults) => {
-        let packageDetailModels = this.mapSearchResultsToPackageDetails(results.data, source);
-        this.setInstalledInformation(packageDetailModels);
-        packageDetailModels = this.filterResultsToMatchCategory(packageDetailModels);
-
-        this._currentPackages.next(packageDetailModels);
+      this.nugetService.searchByPackageIds(currentInstalledPackageIds, query, prerelease, source).subscribe((packageRowModels: PackageRowModel[]) => {
+        this.setInstalledInformation(packageRowModels);
+        packageRowModels = this.filterResultsToMatchCategory(packageRowModels);
+        this._currentPackages.next(packageRowModels);
       });
     }
   }
@@ -90,15 +99,25 @@ export class PackageManagerService {
     this._currentSources.next(sources);
   }
 
-  public changeCurrentSelectedPackage(selectedPackage: PackageDetailsModel | null): void {
-    this._currentSelectedPackage.next(selectedPackage);
+  public changeCurrentSelectedPackage(selectedPackage: PackageRowModel | null): void {
+    this._currentSelectedPackageId.next(selectedPackage?.id ?? null);
+    this._currentSelectedPackage.next(null);
+    if (selectedPackage == null || selectedPackage.versions !== undefined) {
+      this._currentSelectedPackage.next(selectedPackage);
+    } else {
+      // query the api for the package metadata and use the versions from the result
+      this.nugetService.searchByPackageIds([selectedPackage?.id], '', this._currentPrerelease, this._currentSource!).subscribe((results) => {
+        selectedPackage.versions = results[0].versions;
+        this._currentSelectedPackage.next(selectedPackage);
+      });
+    }
   }
 
   public changeCurrentCategory(category: Category): void {
     this._currentCategory.next(category);
   }
 
-  public installPackage(packageToInstall: PackageDetailsModel | null, version?: string) {
+  public installPackage(packageToInstall: PackageRowModel | null, version?: string) {
     if (packageToInstall === null) {
       return;
     }
@@ -114,7 +133,7 @@ export class PackageManagerService {
     });
   }
 
-  public uninstallPackage(packageToUninstall: PackageDetailsModel | null) {
+  public uninstallPackage(packageToUninstall: PackageRowModel | null) {
     if (packageToUninstall === null) {
       return;
     }
@@ -126,25 +145,10 @@ export class PackageManagerService {
     });
   }
 
-  private mapSearchResultsToPackageDetails(packageSearchResults: PackageDetailsSearchResult[], source: PackageSource): PackageDetailsModel[] {
-    const packagesWithInstalledInfo = packageSearchResults.map((psr) => {
-      const pdm = {
-        ...psr,
-        isInstalled: false,
-        installedVersion: '',
-        isOutdated: false,
-        sourceUrl: source.url,
-      };
-      return pdm as PackageDetailsModel;
-    });
-
-    return packagesWithInstalledInfo;
-  }
-
-  private setInstalledInformation(packageDetailModels: PackageDetailsModel[]): void {
+  private setInstalledInformation(packageRowModels: PackageRowModel[]): void {
     const currentInstalledPackages = this._currentInstalledPackages.value;
 
-    packageDetailModels.forEach((pdm) => {
+    packageRowModels.forEach((pdm) => {
       const installedPackage = currentInstalledPackages?.find((p) => p.id === pdm.id);
 
       pdm.isInstalled = installedPackage !== undefined;
@@ -153,13 +157,13 @@ export class PackageManagerService {
     });
   }
 
-  private filterResultsToMatchCategory(packageDetailModels: PackageDetailsModel[]): PackageDetailsModel[] {
+  private filterResultsToMatchCategory(packageRowModels: PackageRowModel[]): PackageRowModel[] {
     const currentCategory = this._currentCategory.value;
     if (currentCategory === Category.Updates) {
-      return packageDetailModels.filter((pdm) => pdm.isOutdated);
+      return packageRowModels.filter((pdm) => pdm.isOutdated);
     }
 
-    return packageDetailModels;
+    return packageRowModels;
   }
 
   private getCurrentInstalledPackageIds(): string[] {

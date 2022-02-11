@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { PackageDetailsModel } from 'src/app/models/package-details';
-import { PackageDetailsSearchResult } from 'src/app/models/search-results';
+import { PackageRowModel } from 'src/app/models/package-details';
+import { PackageSearchResult } from 'src/app/models/search-results';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
 
 @Component({
@@ -10,9 +10,9 @@ import { PackageManagerService } from 'src/app/services/package-manager.service'
   styleUrls: ['./package-list.component.scss'],
 })
 export class PackageListComponent implements OnInit, OnDestroy {
-  public packages: PackageDetailsModel[] | null = null;
+  public packages: PackageRowModel[] | null = null;
 
-  public currentSelectedPackageId: string | undefined;
+  public currentSelectedPackageId: string | null = null;
 
   private subscriptions: Subscription[] = [];
 
@@ -34,7 +34,7 @@ export class PackageListComponent implements OnInit, OnDestroy {
 
   private listenForCurrentPackages(): void {
     this.subscriptions.push(
-      this.packageManager.currentPackages.subscribe((packages: PackageDetailsModel[] | null) => {
+      this.packageManager.currentPackages.subscribe((packages: PackageRowModel[] | null) => {
         this.packages = packages;
       })
     );
@@ -42,8 +42,8 @@ export class PackageListComponent implements OnInit, OnDestroy {
 
   private listenForCurrentSelectedPackage() {
     this.subscriptions.push(
-      this.packageManager.currentSelectedPackage.subscribe((selectedPackage: PackageDetailsSearchResult | null) => {
-        this.currentSelectedPackageId = selectedPackage?.id;
+      this.packageManager.currentSelectedPackageId.subscribe((selectedPackageId: string | null) => {
+        this.currentSelectedPackageId = selectedPackageId;
       })
     );
   }

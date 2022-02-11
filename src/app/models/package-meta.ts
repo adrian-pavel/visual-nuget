@@ -25,6 +25,7 @@ export interface CatalogEntry {
   projectUrl: string;
   tags: string | string[];
   dependencyGroups: PackageDependencyGroup[] | undefined;
+  published: string;
 }
 
 export interface PackageDependencyGroup {
