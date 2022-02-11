@@ -17,8 +17,18 @@ export default class ProjectFileLoader {
 
   private async readPackagesAsync(projectContent: string): Promise<Package[]> {
     var parsedXml = await xml2js.parseStringPromise(projectContent);
-    const packageReferenceGroup = parsedXml.Project.ItemGroup.find((ig: any) => ig.PackageReference !== undefined).PackageReference as Array<any>;
-    const packages = packageReferenceGroup.map((prg: any) => {
+    if (!parsedXml.Project.ItemGroup) {
+      return [];
+    }
+    const packageReferenceGroup = parsedXml.Project.ItemGroup.find((ig: any) => ig.PackageReference !== undefined);
+
+    if (!packageReferenceGroup) {
+      return [];
+    }
+
+    const packageReferences = packageReferenceGroup.PackageReference as Array<any>;
+
+    const packages = packageReferences.map((prg: any) => {
       return {
         id: prg.$.Include,
         version: prg.$.Version,

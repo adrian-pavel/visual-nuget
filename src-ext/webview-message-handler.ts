@@ -48,7 +48,7 @@ export default class WebviewMessageHandler {
   private addPackage(message: any): void {
     const args = [
       'add',
-      { value: message.projectName, quoting: vscode.ShellQuoting.Weak },
+      { value: message.projectName, quoting: vscode.ShellQuoting.Strong },
       'package',
       message.packageId,
       '-v',
@@ -69,7 +69,7 @@ export default class WebviewMessageHandler {
   }
 
   private removePackage(message: any): void {
-    const args = ['remove', { value: message.projectName, quoting: vscode.ShellQuoting.Weak }, 'package', message.packageId];
+    const args = ['remove', { value: message.projectName, quoting: vscode.ShellQuoting.Strong }, 'package', message.packageId];
 
     const task = new vscode.Task(
       { type: 'dotnet', task: `remove` },
