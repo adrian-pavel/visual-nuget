@@ -16,7 +16,6 @@ export class PackageDetailsComponent implements OnInit {
   public selectedVersion: FormControl = new FormControl();
 
   public get selectedVersionObject(): CatalogEntry {
-    console.log(this.selectedVersion.value);
     return this.selectedVersion.value as CatalogEntry;
   }
 

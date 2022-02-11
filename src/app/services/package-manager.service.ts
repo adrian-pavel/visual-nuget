@@ -44,6 +44,14 @@ export class PackageManagerService {
     return this._currentSelectedPackage.asObservable();
   }
 
+  private _currentSelectedPackageId = new BehaviorSubject<string | null>(null);
+  public get currentSelectedPackageId(): Observable<string | null> {
+    return this._currentSelectedPackageId.asObservable();
+  }
+
+  private _currentSource: PackageSource | null = null;
+  private _currentPrerelease: boolean = false;
+
   constructor(private nugetService: NuGetApiService) {
     // tell the extension to load the project and it's installed packages
     // now we are sure the UI is loaded and ready to receive the message
@@ -54,7 +62,11 @@ export class PackageManagerService {
 
   public queryForPackages(query: string, prerelease: boolean, source: PackageSource): void {
     this._currentSelectedPackage.next(null);
+    this._currentSelectedPackageId.next(null);
     this._currentPackages.next(null);
+
+    this._currentSource = source;
+    this._currentPrerelease = prerelease;
 
     const currentCategory = this._currentCategory.value;
 
@@ -89,7 +101,17 @@ export class PackageManagerService {
   }
 
   public changeCurrentSelectedPackage(selectedPackage: PackageRowModel | null): void {
-    this._currentSelectedPackage.next(selectedPackage);
+    this._currentSelectedPackageId.next(selectedPackage?.id ?? null);
+    this._currentSelectedPackage.next(null);
+    if (selectedPackage == null || selectedPackage.versions !== undefined) {
+      this._currentSelectedPackage.next(selectedPackage);
+    } else {
+      // query the api for the package metadata and use the versions from the result
+      this.nugetService.searchByPackageIds([selectedPackage?.id], '', this._currentPrerelease, this._currentSource!).subscribe((results) => {
+        selectedPackage.versions = results[0].versions;
+        this._currentSelectedPackage.next(selectedPackage);
+      });
+    }
   }
 
   public changeCurrentCategory(category: Category): void {

@@ -12,7 +12,7 @@ import { PackageManagerService } from 'src/app/services/package-manager.service'
 export class PackageListComponent implements OnInit, OnDestroy {
   public packages: PackageRowModel[] | null = null;
 
-  public currentSelectedPackageId: string | undefined;
+  public currentSelectedPackageId: string | null = null;
 
   private subscriptions: Subscription[] = [];
 
@@ -42,8 +42,8 @@ export class PackageListComponent implements OnInit, OnDestroy {
 
   private listenForCurrentSelectedPackage() {
     this.subscriptions.push(
-      this.packageManager.currentSelectedPackage.subscribe((selectedPackage: PackageSearchResult | null) => {
-        this.currentSelectedPackageId = selectedPackage?.id;
+      this.packageManager.currentSelectedPackageId.subscribe((selectedPackageId: string | null) => {
+        this.currentSelectedPackageId = selectedPackageId;
       })
     );
   }

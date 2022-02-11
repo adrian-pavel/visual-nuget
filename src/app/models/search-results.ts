@@ -9,12 +9,6 @@ export interface PackageSearchResult {
   description: string;
   authors: string | string[];
   iconUrl: string;
-  totalDownloads: number;
+  totalDownloads: number | undefined;
   verified: boolean;
-}
-
-export interface Version {
-  '@id': string;
-  version: string;
-  downloads: number;
 }
