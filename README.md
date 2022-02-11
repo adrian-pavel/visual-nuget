@@ -9,6 +9,10 @@ A visual NuGet package manager. Search for, install and uninstall NuGet packages
 1. Github NuGet registry not supported properly yet. Others probably as well.
 2. Lazy loading more results not implemented yet.
 
+## Quick peek
+
+![Quick peek animation](images/quick_peek.gif)
+
 ## How to use
 
 Right click on any .csproj, .fsproj or .vbproj file in your workspace and click on the "Visual NuGet: Manage Packages" menu entry.
@@ -39,6 +43,11 @@ Compose the **authorizationHeader** like so: "Basic MyBase64EncodedString". It s
 Use this string when defining the source in the Settings.
 
 ## Release notes
+
+### v0.1.1
+
+- fixed bug that crashed the extension when used on a project with no installed packages
+- fixed issue with dotnet add quoting caused by VS Code bug. (bug is fixed in latest VS Code version)
 
 ### v0.1.0
 
