@@ -38,13 +38,17 @@
           ><a [href]="selectedVersionObject.licenseUrl">{{ selectedVersionObject.licenseUrl }}</a></span
         >
       </div>
+      <div *ngIf="selectedVersionObject.published" class="details-row">
+        <span class="label">Date published:</span>
+        <span class="content">{{ selectedVersionObject.published | date }}</span>
+      </div>
       <div *ngIf="selectedVersionObject.projectUrl" class="details-row">
         <span class="label">Project url:</span>
         <span class="content"
           ><a [href]="selectedVersionObject.projectUrl">{{ selectedVersionObject.projectUrl }}</a></span
         >
       </div>
-      <div *ngIf="selectedVersionObject.tags?.length" class="details-row">
+      <div *ngIf="selectedVersionObject.tags" class="details-row">
         <span class="label">Tags:</span>
         <span class="content">{{ selectedVersionObject.tags }}</span>
       </div>
