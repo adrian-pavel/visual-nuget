@@ -12,7 +12,7 @@ export class NavBarComponent implements OnInit {
 
   public currentCategory = Category.Browse;
 
-  public currentProjectName = '';
+  public currentProjectName: string | undefined;
 
   constructor(private packageManager: PackageManagerService) {}
 
@@ -28,8 +28,8 @@ export class NavBarComponent implements OnInit {
   }
 
   private listenForProjectNameChange(): void {
-    this.packageManager.currentProjectName.subscribe((projectName) => {
-      this.currentProjectName = projectName;
+    this.packageManager.currentProject.subscribe((project) => {
+      this.currentProjectName = project?.name;
     });
   }
 

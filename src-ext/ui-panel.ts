@@ -9,28 +9,31 @@ export default class UiPanel {
   private static readonly viewType = 'angular';
 
   private readonly panel: vscode.WebviewPanel;
-  private readonly projectName: string;
+  private readonly projectFileUri: vscode.Uri;
   private readonly extensionPath: string;
   private readonly builtAppFolder: string;
   private readonly webviewMessageHandler: WebviewMessageHandler;
   private disposables: vscode.Disposable[] = [];
 
-  public static createOrShow(extensionPath: string, projectName: string) {
+  public static createOrShow(extensionPath: string, projectFileUri: vscode.Uri) {
     const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
 
-    if (UiPanel.currentPanels[projectName]) {
-      UiPanel.currentPanels[projectName]!.panel.reveal(column);
+    const projectFilePath = projectFileUri.path;
+
+    if (UiPanel.currentPanels[projectFilePath]) {
+      UiPanel.currentPanels[projectFilePath]!.panel.reveal(column);
     } else {
-      UiPanel.currentPanels[projectName] = new UiPanel(extensionPath, column || vscode.ViewColumn.One, projectName);
+      UiPanel.currentPanels[projectFilePath] = new UiPanel(extensionPath, column || vscode.ViewColumn.One, projectFileUri);
     }
     return UiPanel.currentPanels;
   }
 
-  private constructor(extensionPath: string, column: vscode.ViewColumn, projectName: string) {
+  private constructor(extensionPath: string, column: vscode.ViewColumn, projectFileUri: vscode.Uri) {
     this.extensionPath = extensionPath;
     this.builtAppFolder = 'dist';
-    this.projectName = projectName;
+    this.projectFileUri = projectFileUri;
 
+    const projectName = path.basename(this.projectFileUri.path);
     this.panel = vscode.window.createWebviewPanel(UiPanel.viewType, `Visual NuGet: ${projectName}`, column, {
       enableScripts: true,
       localResourceRoots: [vscode.Uri.file(path.join(this.extensionPath, this.builtAppFolder))],
@@ -42,11 +45,11 @@ export default class UiPanel {
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
     // initialize the message handler for the communication between the webview and the extension
-    this.webviewMessageHandler = new WebviewMessageHandler(this.panel.webview, this.projectName);
+    this.webviewMessageHandler = new WebviewMessageHandler(this.panel.webview, this.projectFileUri.fsPath);
   }
 
   private dispose() {
-    UiPanel.currentPanels[this.projectName] = undefined;
+    UiPanel.currentPanels[this.projectFileUri.path] = undefined;
 
     this.webviewMessageHandler.dispose();
 
