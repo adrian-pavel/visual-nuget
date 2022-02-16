@@ -24,19 +24,14 @@ export class PackageManagerService {
     return this._currentCategory.asObservable();
   }
 
-  private _currentProjectName = new BehaviorSubject<string>('');
-  public get currentProjectName(): Observable<string> {
-    return this._currentProjectName.asObservable();
+  private _currentProject = new BehaviorSubject<Project | null>(null);
+  public get currentProject(): Observable<Project | null> {
+    return this._currentProject.asObservable();
   }
 
   private _currentPackages = new BehaviorSubject<PackageRowModel[] | null>(null);
   public get currentPackages(): Observable<PackageRowModel[] | null> {
     return this._currentPackages.asObservable();
-  }
-
-  private _currentInstalledPackages = new BehaviorSubject<Package[] | null>(null);
-  public get currentInstalledPackages(): Observable<Package[] | null> {
-    return this._currentInstalledPackages.asObservable();
   }
 
   private _currentSelectedPackage = new BehaviorSubject<PackageRowModel | null>(null);
@@ -92,8 +87,7 @@ export class PackageManagerService {
   }
 
   public setProject(project: Project) {
-    this._currentProjectName.next(project.name);
-    this._currentInstalledPackages.next(project.packages);
+    this._currentProject.next(project);
 
     const currentPackages = this._currentPackages.value;
     if (currentPackages && project.packages.length) {
@@ -132,7 +126,7 @@ export class PackageManagerService {
 
     vscode.postMessage({
       command: 'add-package',
-      projectName: this._currentProjectName.value,
+      projectName: this._currentProject.value?.fsPath,
       packageId: packageToInstall.id,
       packageVersion: versionToInstall,
       packageSourceUrl: packageToInstall.sourceUrl,
@@ -146,21 +140,23 @@ export class PackageManagerService {
 
     vscode.postMessage({
       command: 'remove-package',
-      projectName: this._currentProjectName.value,
+      projectName: this._currentProject.value?.fsPath,
       packageId: packageToUninstall.id,
     });
   }
 
   private setInstalledInformation(packageRowModels: PackageRowModel[]): void {
-    const currentInstalledPackages = this._currentInstalledPackages.value;
+    const currentInstalledPackages = this._currentProject.value?.packages;
 
-    packageRowModels.forEach((pdm) => {
-      const installedPackage = currentInstalledPackages?.find((p) => p.id === pdm.id);
+    if (currentInstalledPackages) {
+      packageRowModels.forEach((pdm) => {
+        const installedPackage = currentInstalledPackages?.find((p) => p.id === pdm.id);
 
-      pdm.isInstalled = installedPackage !== undefined;
-      pdm.installedVersion = pdm.isInstalled ? installedPackage!.version : '';
-      pdm.isOutdated = pdm.isInstalled && pdm.installedVersion !== pdm.version;
-    });
+        pdm.isInstalled = installedPackage !== undefined;
+        pdm.installedVersion = pdm.isInstalled ? installedPackage!.version : '';
+        pdm.isOutdated = pdm.isInstalled && pdm.installedVersion !== pdm.version;
+      });
+    }
   }
 
   private filterResultsToMatchCategory(packageRowModels: PackageRowModel[]): PackageRowModel[] {
@@ -173,7 +169,7 @@ export class PackageManagerService {
   }
 
   private getCurrentInstalledPackageIds(): string[] {
-    const currentInstalledPackages = this._currentInstalledPackages.value;
+    const currentInstalledPackages = this._currentProject.value?.packages;
 
     if (!currentInstalledPackages) {
       return [];

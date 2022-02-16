@@ -7,7 +7,7 @@ export default class WebviewMessageHandler {
   private readonly projectFileLoader: ProjectFileLoader;
   private readonly taskName = 'visual-nuget';
 
-  public constructor(private readonly webview: vscode.Webview, private readonly projectName: string) {
+  public constructor(private readonly webview: vscode.Webview, private readonly projectFilePath: string) {
     this.projectFileLoader = new ProjectFileLoader();
 
     this.webview.onDidReceiveMessage(
@@ -82,7 +82,7 @@ export default class WebviewMessageHandler {
   }
 
   private loadProject(): void {
-    this.projectFileLoader.loadProjectAsync(this.projectName).then((project) => {
+    this.projectFileLoader.loadProjectAsync(this.projectFilePath).then((project) => {
       this.webview.postMessage({ type: 'project', data: project });
     });
   }

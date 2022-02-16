@@ -1,16 +1,19 @@
-import * as vscode from 'vscode';
-import * as xml2js from 'xml2js';
 import * as fs from 'fs';
+import * as xml2js from 'xml2js';
+import * as path from 'path';
+
 import { Package, Project } from './models/project';
 
 export default class ProjectFileLoader {
-  public async loadProjectAsync(projectName: string): Promise<Project> {
-    const files = await vscode.workspace.findFiles(projectName);
-    const projectFilePath = files[0].fsPath;
+  public async loadProjectAsync(projectFilePath: string): Promise<Project> {
     const projectContent = fs.readFileSync(projectFilePath, 'utf8');
     const packages = await this.readPackagesAsync(projectContent);
+
+    const projectName = path.basename(projectFilePath);
+
     return {
       name: projectName,
+      fsPath: projectFilePath,
       packages: packages,
     };
   }
