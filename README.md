@@ -44,6 +44,11 @@ Use this string when defining the source in the Settings.
 
 ## Release notes
 
+### v0.1.2
+
+- fixed bug where project files in sub-directories were not processed correctly (Installed/Updates did not work)
+- added tooltip with full project file path on hover over project name in nav-bar
+
 ### v0.1.1
 
 - fixed bug that crashed the extension when used on a project with no installed packages
