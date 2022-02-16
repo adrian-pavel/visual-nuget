@@ -19,9 +19,9 @@
     </button>
   </div>
 
-  <div class="navbar-end">
+  <div class="navbar-end" [title]="currentProjectFsPath">
     <div class="navbar-item">
-      <span>Visual NuGet: {{ currentProjectName }}</span>
+      <span class="project-name">Visual NuGet: {{ currentProjectName }}</span>
     </div>
   </div>
 </nav>
