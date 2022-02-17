@@ -1,39 +1,30 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 import { PackageRowModel } from 'src/app/models/package-details';
-import { PackageSearchResult } from 'src/app/models/search-results';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
+
+import { BaseComponent } from '../base-component';
 
 @Component({
   selector: 'app-package-list',
   templateUrl: './package-list.component.html',
   styleUrls: ['./package-list.component.scss'],
 })
-export class PackageListComponent implements OnInit, OnDestroy {
+export class PackageListComponent extends BaseComponent implements OnInit {
   public packages: PackageRowModel[] | null = null;
 
   public currentSelectedPackageId: string | null = null;
 
-  private subscriptions: Subscription[] = [];
-
-  constructor(private packageManager: PackageManagerService) {}
+  constructor(private packageManager: PackageManagerService) {
+    super();
+  }
 
   ngOnInit(): void {
     this.listenForCurrentPackages();
     this.listenForCurrentSelectedPackage();
   }
 
-  ngOnDestroy(): void {
-    if (this.subscriptions) {
-      for (const sub of this.subscriptions) {
-        sub.unsubscribe();
-      }
-      this.subscriptions = [];
-    }
-  }
-
   private listenForCurrentPackages(): void {
-    this.subscriptions.push(
+    this.subscriptions.add(
       this.packageManager.currentPackages.subscribe((packages: PackageRowModel[] | null) => {
         this.packages = packages;
       })
@@ -41,7 +32,7 @@ export class PackageListComponent implements OnInit, OnDestroy {
   }
 
   private listenForCurrentSelectedPackage() {
-    this.subscriptions.push(
+    this.subscriptions.add(
       this.packageManager.currentSelectedPackageId.subscribe((selectedPackageId: string | null) => {
         this.currentSelectedPackageId = selectedPackageId;
       })

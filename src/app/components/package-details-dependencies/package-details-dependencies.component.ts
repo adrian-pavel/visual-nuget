@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { PackageDependencyGroup } from 'src/app/models/package-meta';
 
 @Component({

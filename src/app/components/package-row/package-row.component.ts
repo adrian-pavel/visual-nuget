@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { PackageRowModel } from 'src/app/models/package-details';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
 

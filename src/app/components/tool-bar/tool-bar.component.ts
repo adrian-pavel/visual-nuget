@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { PackageManagerService } from 'src/app/services/package-manager.service';
-
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { PackageSource } from 'src/app/models/package-source';
+import { PackageManagerService } from 'src/app/services/package-manager.service';
+
+import { BaseComponent } from '../base-component';
 
 @Component({
   selector: 'app-tool-bar',
   templateUrl: './tool-bar.component.html',
   styleUrls: ['./tool-bar.component.scss'],
 })
-export class ToolBarComponent implements OnInit {
+export class ToolBarComponent extends BaseComponent implements OnInit {
   private readonly nugetOrg: PackageSource = {
     name: 'nuget.org',
     url: 'https://api.nuget.org/v3/index.json',
@@ -25,7 +26,9 @@ export class ToolBarComponent implements OnInit {
     source: [this.packageSources[0]],
   });
 
-  constructor(private packageManager: PackageManagerService, private fb: FormBuilder) {}
+  constructor(private packageManager: PackageManagerService, private fb: FormBuilder) {
+    super();
+  }
 
   ngOnInit(): void {
     this.listenForFormChanges();
@@ -42,13 +45,15 @@ export class ToolBarComponent implements OnInit {
   }
 
   private listenForSourcesChanges(): void {
-    this.packageManager.currentSources.subscribe((newSources) => {
-      this.packageSources = [this.nugetOrg, ...newSources];
-    });
+    this.subscriptions.add(
+      this.packageManager.currentSources.subscribe((newSources) => {
+        this.packageSources = [this.nugetOrg, ...newSources];
+      })
+    );
   }
 
   private listenForFormChanges(): void {
-    this.searchForm.valueChanges.pipe(debounceTime(500)).subscribe((_) => this.refresh());
+    this.subscriptions.add(this.searchForm.valueChanges.pipe(debounceTime(500)).subscribe((_) => this.refresh()));
   }
 
   private getQueryValue(): string {
@@ -64,8 +69,10 @@ export class ToolBarComponent implements OnInit {
   }
 
   private listenForCategoryChanges() {
-    this.packageManager.currentCategory.subscribe(() => {
-      this.refresh();
-    });
+    this.subscriptions.add(
+      this.packageManager.currentCategory.subscribe(() => {
+        this.refresh();
+      })
+    );
   }
 }
