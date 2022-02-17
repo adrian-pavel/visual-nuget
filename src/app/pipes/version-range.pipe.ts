@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'versionRange',
 })
 export class VersionRangePipe implements PipeTransform {
-  transform(value: string, ..._args: unknown[]): string {
+  transform(value: string): string {
     // [1.6.1, 2.0.3)
     // [1.6.1, )
     // ( ,1.6.1]

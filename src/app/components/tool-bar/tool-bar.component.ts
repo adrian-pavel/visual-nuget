@@ -1,23 +1,18 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { debounceTime } from 'rxjs/operators';
+import { NUGET_ORG, PackageSource } from 'src/app/models/package-source';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
 
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { debounceTime } from 'rxjs/operators';
-import { PackageSource } from 'src/app/models/package-source';
+import { BaseComponent } from '../base-component';
 
 @Component({
   selector: 'app-tool-bar',
   templateUrl: './tool-bar.component.html',
   styleUrls: ['./tool-bar.component.scss'],
 })
-export class ToolBarComponent implements OnInit {
-  private readonly nugetOrg: PackageSource = {
-    name: 'nuget.org',
-    url: 'https://api.nuget.org/v3/index.json',
-    authorizationHeader: undefined,
-  };
-
-  public packageSources: PackageSource[] = [this.nugetOrg];
+export class ToolBarComponent extends BaseComponent implements OnInit {
+  public packageSources: PackageSource[] = [NUGET_ORG];
 
   public searchForm: FormGroup = this.fb.group({
     query: [''],
@@ -25,7 +20,9 @@ export class ToolBarComponent implements OnInit {
     source: [this.packageSources[0]],
   });
 
-  constructor(private packageManager: PackageManagerService, private fb: FormBuilder) {}
+  constructor(private packageManager: PackageManagerService, private fb: FormBuilder) {
+    super();
+  }
 
   ngOnInit(): void {
     this.listenForFormChanges();
@@ -41,14 +38,24 @@ export class ToolBarComponent implements OnInit {
     this.packageManager.queryForPackages(query, prerelease, source);
   }
 
-  private listenForSourcesChanges(): void {
-    this.packageManager.currentSources.subscribe((newSources) => {
-      this.packageSources = [this.nugetOrg, ...newSources];
-    });
+  private listenForFormChanges(): void {
+    this.subscriptions.add(this.searchForm.valueChanges.pipe(debounceTime(500)).subscribe(() => this.refresh()));
   }
 
-  private listenForFormChanges(): void {
-    this.searchForm.valueChanges.pipe(debounceTime(500)).subscribe((_) => this.refresh());
+  private listenForCategoryChanges() {
+    this.subscriptions.add(
+      this.packageManager.currentCategory.subscribe(() => {
+        this.refresh();
+      })
+    );
+  }
+
+  private listenForSourcesChanges(): void {
+    this.subscriptions.add(
+      this.packageManager.currentSources.subscribe((newSources) => {
+        this.packageSources = [NUGET_ORG, ...newSources];
+      })
+    );
   }
 
   private getQueryValue(): string {
@@ -61,11 +68,5 @@ export class ToolBarComponent implements OnInit {
 
   private getSourceValue(): PackageSource {
     return this.searchForm.get('source')?.value ?? this.packageSources[0];
-  }
-
-  private listenForCategoryChanges() {
-    this.packageManager.currentCategory.subscribe(() => {
-      this.refresh();
-    });
   }
 }

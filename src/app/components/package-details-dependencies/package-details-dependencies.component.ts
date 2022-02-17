@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { PackageDependencyGroup } from 'src/app/models/package-meta';
 
 @Component({
@@ -6,11 +6,7 @@ import { PackageDependencyGroup } from 'src/app/models/package-meta';
   templateUrl: './package-details-dependencies.component.html',
   styleUrls: ['./package-details-dependencies.component.scss'],
 })
-export class PackageDetailsDependenciesComponent implements OnInit {
+export class PackageDetailsDependenciesComponent {
   @Input()
   public dependencyGroups: PackageDependencyGroup[] | undefined;
-
-  constructor() {}
-
-  ngOnInit(): void {}
 }

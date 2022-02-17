@@ -1,10 +1,10 @@
 export interface Project {
   name: string;
   fsPath: string;
-  packages: Package[];
+  packages: InstalledPackage[];
 }
 
-export interface Package {
+export interface InstalledPackage {
   id: string;
   version: string;
 }

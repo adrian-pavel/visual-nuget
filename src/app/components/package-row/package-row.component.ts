@@ -1,5 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { PackageRowModel } from 'src/app/models/package-details';
+import { Component, Input } from '@angular/core';
+import { PackageRowModel } from 'src/app/models/package-row-model';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
 
 @Component({
@@ -7,16 +7,14 @@ import { PackageManagerService } from 'src/app/services/package-manager.service'
   templateUrl: './package-row.component.html',
   styleUrls: ['./package-row.component.scss'],
 })
-export class PackageRowComponent implements OnInit {
+export class PackageRowComponent {
   @Input()
-  public isActive: boolean = false;
+  public isActive = false;
 
   @Input()
   public package: PackageRowModel | null = null;
 
   constructor(private packageManager: PackageManagerService) {}
-
-  ngOnInit(): void {}
 
   public select(): void {
     this.packageManager.changeCurrentSelectedPackage(this.package);

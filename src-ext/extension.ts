@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
+
 import UiPanel from './ui-panel';
-import * as path from 'path';
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
@@ -9,5 +9,3 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 }
-
-export function deactivate() {}

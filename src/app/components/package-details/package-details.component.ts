@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { PackageRowModel } from 'src/app/models/package-details';
+import { PackageRowModel } from 'src/app/models/package-row-model';
 import { CatalogEntry } from 'src/app/models/package-meta';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
+
+import { BaseComponent } from '../base-component';
 
 @Component({
   selector: 'app-package-details',
   templateUrl: './package-details.component.html',
   styleUrls: ['./package-details.component.scss'],
 })
-export class PackageDetailsComponent implements OnInit {
+export class PackageDetailsComponent extends BaseComponent implements OnInit {
   public package: PackageRowModel | null = null;
 
   public selectedVersion: FormControl = new FormControl();
@@ -19,21 +20,12 @@ export class PackageDetailsComponent implements OnInit {
     return this.selectedVersion.value as CatalogEntry;
   }
 
-  private subscriptions: Subscription[] = [];
-
-  constructor(private packageManager: PackageManagerService) {}
+  constructor(private packageManager: PackageManagerService) {
+    super();
+  }
 
   ngOnInit(): void {
     this.listenForCurrentPackage();
-  }
-
-  ngOnDestroy(): void {
-    if (this.subscriptions) {
-      for (const sub of this.subscriptions) {
-        sub.unsubscribe();
-      }
-      this.subscriptions = [];
-    }
   }
 
   public install(): void {
@@ -45,12 +37,12 @@ export class PackageDetailsComponent implements OnInit {
   }
 
   private listenForCurrentPackage(): void {
-    this.subscriptions.push(
+    this.subscriptions.add(
       this.packageManager.currentSelectedPackage.subscribe((selectedPackage: PackageRowModel | null) => {
         this.package = selectedPackage;
         if (this.package) {
           // we will make sure to load versions before getting here
-          this.selectedVersion.setValue(this.package.versions![0]);
+          this.selectedVersion.setValue(this.package.versions?.[0]);
         }
       })
     );
