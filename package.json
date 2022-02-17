@@ -104,7 +104,7 @@
     "@fortawesome/angular-fontawesome": "^0.10.1",
     "@fortawesome/fontawesome-svg-core": "~1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
-    "rxjs": "~7.4.0",
+    "rxjs": "~7.5.4",
     "semver": "^7.3.5",
     "tslib": "^2.3.0",
     "xml2js": "^0.4.23",
