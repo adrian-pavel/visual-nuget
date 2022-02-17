@@ -44,6 +44,11 @@ Use this string when defining the source in the Settings.
 
 ## Release notes
 
+### v0.1.3
+
+- minor bug fixes
+- code quality improvements
+
 ### v0.1.2
 
 - fixed bug where project files in sub-directories were not processed correctly (Installed/Updates did not work)
