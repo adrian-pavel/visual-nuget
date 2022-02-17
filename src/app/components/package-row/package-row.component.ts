@@ -9,7 +9,7 @@ import { PackageManagerService } from 'src/app/services/package-manager.service'
 })
 export class PackageRowComponent {
   @Input()
-  public isActive: boolean = false;
+  public isActive = false;
 
   @Input()
   public package: PackageRowModel | null = null;

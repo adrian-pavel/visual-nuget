@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { InstallMessage, UIMessage, UninstallMessage } from './models/ui-message';
 
 import ProjectFileLoader from './project-file-loader';
 
@@ -11,7 +12,7 @@ export default class WebviewMessageHandler {
     this.projectFileLoader = new ProjectFileLoader();
 
     this.webview.onDidReceiveMessage(
-      (message: any) => {
+      (message: UIMessage) => {
         this.handleMessage(message);
       },
       null,
@@ -30,13 +31,13 @@ export default class WebviewMessageHandler {
     });
   }
 
-  private handleMessage(message: any): void {
+  private handleMessage(message: UIMessage): void {
     switch (message.command) {
       case 'add-package':
-        this.addPackage(message);
+        this.addPackage(message as InstallMessage);
         return;
       case 'remove-package':
-        this.removePackage(message);
+        this.removePackage(message as UninstallMessage);
         return;
       case 'load-project':
         this.loadProject();
@@ -45,7 +46,7 @@ export default class WebviewMessageHandler {
     }
   }
 
-  private addPackage(message: any): void {
+  private addPackage(message: InstallMessage): void {
     const args = [
       'add',
       { value: message.projectName, quoting: vscode.ShellQuoting.Strong },
@@ -68,7 +69,7 @@ export default class WebviewMessageHandler {
     vscode.tasks.executeTask(task).then();
   }
 
-  private removePackage(message: any): void {
+  private removePackage(message: UninstallMessage): void {
     const args = ['remove', { value: message.projectName, quoting: vscode.ShellQuoting.Strong }, 'package', message.packageId];
 
     const task = new vscode.Task(
@@ -88,7 +89,7 @@ export default class WebviewMessageHandler {
   }
 
   private loadConfiguration(): void {
-    let configuration = vscode.workspace.getConfiguration('VisualNuGet');
+    const configuration = vscode.workspace.getConfiguration('VisualNuGet');
     try {
       const sourcesStrings = configuration['sources'];
 

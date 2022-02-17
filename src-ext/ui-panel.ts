@@ -20,8 +20,10 @@ export default class UiPanel {
 
     const projectFilePath = projectFileUri.path;
 
-    if (UiPanel.currentPanels[projectFilePath]) {
-      UiPanel.currentPanels[projectFilePath]!.panel.reveal(column);
+    const existingPanel = UiPanel.currentPanels[projectFilePath];
+
+    if (existingPanel) {
+      existingPanel.panel.reveal(column);
     } else {
       UiPanel.currentPanels[projectFilePath] = new UiPanel(extensionPath, column || vscode.ViewColumn.One, projectFileUri);
     }

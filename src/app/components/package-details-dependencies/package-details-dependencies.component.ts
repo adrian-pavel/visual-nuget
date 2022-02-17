@@ -9,6 +9,4 @@ import { PackageDependencyGroup } from 'src/app/models/package-meta';
 export class PackageDetailsDependenciesComponent {
   @Input()
   public dependencyGroups: PackageDependencyGroup[] | undefined;
-
-  constructor() {}
 }

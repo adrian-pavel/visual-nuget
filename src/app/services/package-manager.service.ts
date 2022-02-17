@@ -3,10 +3,11 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 import { Category } from '../models/category';
 import { PackageRowModel } from '../models/package-row-model';
-import { PackageSource } from '../models/package-source';
+import { NUGET_ORG, PackageSource } from '../models/package-source';
 import { InstalledPackage, Project } from '../models/project';
 import { NuGetApiService } from './nuget-api.service';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare function acquireVsCodeApi(): any;
 const vscode = acquireVsCodeApi();
 
@@ -44,8 +45,8 @@ export class PackageManagerService {
     return this._currentSelectedPackageId.asObservable();
   }
 
-  private _currentSource: PackageSource | null = null;
-  private _currentPrerelease: boolean = false;
+  private _currentSource: PackageSource = NUGET_ORG;
+  private _currentPrerelease = false;
 
   constructor(private nugetService: NuGetApiService) {
     // tell the extension to load the project and it's installed packages
@@ -110,7 +111,7 @@ export class PackageManagerService {
       this._currentSelectedPackage.next(selectedPackage);
     } else {
       // else query the api for the package metadata and use the versions from the result
-      this.nugetService.searchByPackageIds([selectedPackage?.id], '', this._currentPrerelease, this._currentSource!).subscribe((results) => {
+      this.nugetService.searchByPackageIds([selectedPackage?.id], '', this._currentPrerelease, this._currentSource).subscribe((results) => {
         selectedPackage.versions = results[0].versions;
         this._currentSelectedPackage.next(selectedPackage);
       });

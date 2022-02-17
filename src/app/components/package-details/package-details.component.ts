@@ -42,7 +42,7 @@ export class PackageDetailsComponent extends BaseComponent implements OnInit {
         this.package = selectedPackage;
         if (this.package) {
           // we will make sure to load versions before getting here
-          this.selectedVersion.setValue(this.package.versions![0]);
+          this.selectedVersion.setValue(this.package.versions?.[0]);
         }
       })
     );

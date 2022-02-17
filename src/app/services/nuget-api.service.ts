@@ -91,7 +91,7 @@ export class NuGetApiService {
         })
         .pipe(
           //some packages will not exist on some sources, for these return null and filter after
-          catchError((_) => of(null)),
+          catchError(() => of(null)),
           switchMap((packageMeta: PackageMetaResponse | null): Observable<RegistrationLeaf[] | null> => {
             return this.getRegistrationLeafs(packageMeta);
           }),
@@ -127,7 +127,7 @@ export class NuGetApiService {
         // need to fetch each page on an individual request to the API
         const registrationPageRequest = this.http
           .get<RegistrationPage>(page['@id'])
-          .pipe(map((registrationPage: RegistrationPage): RegistrationLeaf[] => registrationPage.items!));
+          .pipe(map((registrationPage: RegistrationPage): RegistrationLeaf[] => registrationPage?.items ?? []));
         allLeafsRequests.push(registrationPageRequest);
       }
     }

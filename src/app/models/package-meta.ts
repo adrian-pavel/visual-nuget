@@ -35,5 +35,5 @@ export interface PackageDependencyGroup {
 
 export interface PackageDependency {
   id: string;
-  range: any;
+  range: string;
 }

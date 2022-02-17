@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as fs from 'fs';
 import * as xml2js from 'xml2js';
 import * as path from 'path';
@@ -19,11 +20,11 @@ export default class ProjectFileLoader {
   }
 
   private async readPackagesAsync(projectContent: string): Promise<Package[]> {
-    var parsedXml = await xml2js.parseStringPromise(projectContent);
+    const parsedXml = await xml2js.parseStringPromise(projectContent);
     if (!parsedXml.Project.ItemGroup) {
       return [];
     }
-    const packageReferenceGroup = parsedXml.Project.ItemGroup.find((ig: any) => ig.PackageReference !== undefined);
+    const packageReferenceGroup = parsedXml.Project.ItemGroup.find((itemGroup: any) => itemGroup.PackageReference !== undefined);
 
     if (!packageReferenceGroup) {
       return [];
@@ -31,10 +32,10 @@ export default class ProjectFileLoader {
 
     const packageReferences = packageReferenceGroup.PackageReference as Array<any>;
 
-    const packages = packageReferences.map((prg: any) => {
+    const packages = packageReferences.map((packageReference: any) => {
       return {
-        id: prg.$.Include,
-        version: prg.$.Version,
+        id: packageReference.$.Include,
+        version: packageReference.$.Version,
       };
     });
     return packages;

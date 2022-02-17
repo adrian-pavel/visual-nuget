@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
-import { PackageSource } from 'src/app/models/package-source';
+import { NUGET_ORG, PackageSource } from 'src/app/models/package-source';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
 
 import { BaseComponent } from '../base-component';
@@ -12,13 +12,7 @@ import { BaseComponent } from '../base-component';
   styleUrls: ['./tool-bar.component.scss'],
 })
 export class ToolBarComponent extends BaseComponent implements OnInit {
-  private readonly nugetOrg: PackageSource = {
-    name: 'nuget.org',
-    url: 'https://api.nuget.org/v3/index.json',
-    authorizationHeader: undefined,
-  };
-
-  public packageSources: PackageSource[] = [this.nugetOrg];
+  public packageSources: PackageSource[] = [NUGET_ORG];
 
   public searchForm: FormGroup = this.fb.group({
     query: [''],
@@ -45,7 +39,7 @@ export class ToolBarComponent extends BaseComponent implements OnInit {
   }
 
   private listenForFormChanges(): void {
-    this.subscriptions.add(this.searchForm.valueChanges.pipe(debounceTime(500)).subscribe((_) => this.refresh()));
+    this.subscriptions.add(this.searchForm.valueChanges.pipe(debounceTime(500)).subscribe(() => this.refresh()));
   }
 
   private listenForCategoryChanges() {
@@ -59,7 +53,7 @@ export class ToolBarComponent extends BaseComponent implements OnInit {
   private listenForSourcesChanges(): void {
     this.subscriptions.add(
       this.packageManager.currentSources.subscribe((newSources) => {
-        this.packageSources = [this.nugetOrg, ...newSources];
+        this.packageSources = [NUGET_ORG, ...newSources];
       })
     );
   }
