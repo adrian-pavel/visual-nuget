@@ -9,7 +9,7 @@
     "name": "Adrian Pavel"
   },
   "engines": {
-    "vscode": "^1.63.0"
+    "vscode": "^1.64.0"
   },
   "main": "./dist/src-ext/extension.js",
   "categories": [
