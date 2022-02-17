@@ -264,16 +264,16 @@ export class NuGetApiService {
     source: PackageSource,
     versions: CatalogEntry[] | undefined = undefined
   ): PackageRowModel[] {
-    const packagesWithInstalledInfo = packageSearchResults.map((psr) => {
-      const pdm: PackageRowModel = {
-        ...psr,
+    const packagesWithInstalledInfo = packageSearchResults.map((packageSearchResult: PackageSearchResult) => {
+      const packageRowModel: PackageRowModel = {
+        ...packageSearchResult,
         isInstalled: false,
         installedVersion: '',
         isOutdated: false,
         sourceUrl: source.url,
         versions: versions,
       };
-      return pdm;
+      return packageRowModel;
     });
 
     return packagesWithInstalledInfo;

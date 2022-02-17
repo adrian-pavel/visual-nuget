@@ -17,9 +17,9 @@ export class AppComponent {
   MessageFromExtension(event: MessageEvent) {
     const message = event.data as Message;
     if (message.type === 'project') {
-      this.packageManager.setProject(message.data as Project);
+      this.packageManager.changeCurrentProject(message.data as Project);
     } else if (message.type === 'sources') {
-      this.packageManager.setSources(message.data as PackageSource[]);
+      this.packageManager.changeCurrentSources(message.data as PackageSource[]);
     }
   }
 }

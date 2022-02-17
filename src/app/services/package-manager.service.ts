@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { Category } from '../models/category';
 import { PackageRowModel } from '../models/package-row-model';
 import { PackageSource } from '../models/package-source';
-import { Project } from '../models/project';
+import { InstalledPackage, Project } from '../models/project';
 import { NuGetApiService } from './nuget-api.service';
 
 declare function acquireVsCodeApi(): any;
@@ -86,7 +86,7 @@ export class PackageManagerService {
     }
   }
 
-  public setProject(project: Project) {
+  public changeCurrentProject(project: Project) {
     this._currentProject.next(project);
 
     const currentPackages = this._currentPackages.value;
@@ -95,17 +95,21 @@ export class PackageManagerService {
     }
   }
 
-  public setSources(sources: PackageSource[]): void {
+  public changeCurrentSources(sources: PackageSource[]): void {
     this._currentSources.next(sources);
   }
 
   public changeCurrentSelectedPackage(selectedPackage: PackageRowModel | null): void {
+    // set the current selected package id so that the list highlights it
     this._currentSelectedPackageId.next(selectedPackage?.id ?? null);
+    // set the current selected package to null to clear the details pane
     this._currentSelectedPackage.next(null);
+
+    // if no package selected or if the versions/metadata for the package are already loaded, just display it
     if (selectedPackage == null || selectedPackage.versions !== undefined) {
       this._currentSelectedPackage.next(selectedPackage);
     } else {
-      // query the api for the package metadata and use the versions from the result
+      // else query the api for the package metadata and use the versions from the result
       this.nugetService.searchByPackageIds([selectedPackage?.id], '', this._currentPrerelease, this._currentSource!).subscribe((results) => {
         selectedPackage.versions = results[0].versions;
         this._currentSelectedPackage.next(selectedPackage);
@@ -122,7 +126,8 @@ export class PackageManagerService {
       return;
     }
 
-    const versionToInstall = version ? version : packageToInstall.version;
+    // if no specific version is provided just install the latest on the package
+    const versionToInstall = version ?? packageToInstall.version;
 
     vscode.postMessage({
       command: 'add-package',
@@ -149,20 +154,21 @@ export class PackageManagerService {
     const currentInstalledPackages = this._currentProject.value?.packages;
 
     if (currentInstalledPackages) {
-      packageRowModels.forEach((pdm) => {
-        const installedPackage = currentInstalledPackages?.find((p) => p.id === pdm.id);
+      packageRowModels.forEach((packageRowModel: PackageRowModel) => {
+        const installedPackage = currentInstalledPackages.find((installedPackage: InstalledPackage) => installedPackage.id === packageRowModel.id);
 
-        pdm.isInstalled = installedPackage !== undefined;
-        pdm.installedVersion = pdm.isInstalled ? installedPackage!.version : '';
-        pdm.isOutdated = pdm.isInstalled && pdm.installedVersion !== pdm.version;
+        packageRowModel.isInstalled = installedPackage !== undefined;
+        packageRowModel.installedVersion = installedPackage ? installedPackage.version : '';
+        packageRowModel.isOutdated = packageRowModel.isInstalled && packageRowModel.installedVersion !== packageRowModel.version;
       });
     }
   }
 
   private filterResultsToMatchCategory(packageRowModels: PackageRowModel[]): PackageRowModel[] {
     const currentCategory = this._currentCategory.value;
+
     if (currentCategory === Category.Updates) {
-      return packageRowModels.filter((pdm) => pdm.isOutdated);
+      return packageRowModels.filter((packageRowModel: PackageRowModel) => packageRowModel.isOutdated);
     }
 
     return packageRowModels;
@@ -175,6 +181,6 @@ export class PackageManagerService {
       return [];
     }
 
-    return currentInstalledPackages.map((ip) => ip.id);
+    return currentInstalledPackages.map((installedPackage: InstalledPackage) => installedPackage.id);
   }
 }
