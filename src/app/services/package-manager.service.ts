@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+
 import { Category } from '../models/category';
-import { PackageRowModel } from '../models/package-details';
+import { PackageRowModel } from '../models/package-row-model';
 import { PackageSource } from '../models/package-source';
-import { Package, Project } from '../models/project';
-import { PackageSearchResult, SearchResults } from '../models/search-results';
+import { Project } from '../models/project';
 import { NuGetApiService } from './nuget-api.service';
 
 declare function acquireVsCodeApi(): any;

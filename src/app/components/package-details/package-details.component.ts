@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { PackageRowModel } from 'src/app/models/package-details';
+import { PackageRowModel } from 'src/app/models/package-row-model';
 import { CatalogEntry } from 'src/app/models/package-meta';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
 

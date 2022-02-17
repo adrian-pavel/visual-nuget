@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { PackageRowModel } from 'src/app/models/package-details';
+import { PackageRowModel } from 'src/app/models/package-row-model';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
 
 import { BaseComponent } from '../base-component';

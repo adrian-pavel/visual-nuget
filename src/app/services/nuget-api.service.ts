@@ -4,7 +4,7 @@ import { catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { coerce, prerelease, rcompare } from 'semver';
 
 import { ApiIndexResponse } from '../models/api-index-response';
-import { PackageRowModel } from '../models/package-details';
+import { PackageRowModel } from '../models/package-row-model';
 import { CatalogEntry, PackageMetaResponse, RegistrationLeaf, RegistrationPage } from '../models/package-meta';
 import { PackageSource } from '../models/package-source';
 import { PackageSearchResult, SearchResults } from '../models/search-results';

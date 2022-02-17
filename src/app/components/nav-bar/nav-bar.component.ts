@@ -26,6 +26,10 @@ export class NavBarComponent extends BaseComponent implements OnInit {
     this.listenForCurrentCategoryChange();
   }
 
+  public categoryChange(category: Category): void {
+    this.packageManager.changeCurrentCategory(category);
+  }
+
   private listenForCurrentCategoryChange(): void {
     this.subscriptions.add(
       this.packageManager.currentCategory.subscribe((category: Category) => {
@@ -41,9 +45,5 @@ export class NavBarComponent extends BaseComponent implements OnInit {
         this.currentProjectFsPath = project?.fsPath;
       })
     );
-  }
-
-  public categoryChange(category: Category): void {
-    this.packageManager.changeCurrentCategory(category);
   }
 }

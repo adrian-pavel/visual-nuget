@@ -1,4 +1,5 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
+
 import { Message } from './models/message';
 import { PackageSource } from './models/package-source';
 import { Project } from './models/project';
@@ -10,8 +11,6 @@ import { PackageManagerService } from './services/package-manager.service';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'visual-nuget';
-
   constructor(private packageManager: PackageManagerService) {}
 
   @HostListener('window:message', ['$event'])

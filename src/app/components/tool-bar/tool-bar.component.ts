@@ -44,16 +44,24 @@ export class ToolBarComponent extends BaseComponent implements OnInit {
     this.packageManager.queryForPackages(query, prerelease, source);
   }
 
+  private listenForFormChanges(): void {
+    this.subscriptions.add(this.searchForm.valueChanges.pipe(debounceTime(500)).subscribe((_) => this.refresh()));
+  }
+
+  private listenForCategoryChanges() {
+    this.subscriptions.add(
+      this.packageManager.currentCategory.subscribe(() => {
+        this.refresh();
+      })
+    );
+  }
+
   private listenForSourcesChanges(): void {
     this.subscriptions.add(
       this.packageManager.currentSources.subscribe((newSources) => {
         this.packageSources = [this.nugetOrg, ...newSources];
       })
     );
-  }
-
-  private listenForFormChanges(): void {
-    this.subscriptions.add(this.searchForm.valueChanges.pipe(debounceTime(500)).subscribe((_) => this.refresh()));
   }
 
   private getQueryValue(): string {
@@ -66,13 +74,5 @@ export class ToolBarComponent extends BaseComponent implements OnInit {
 
   private getSourceValue(): PackageSource {
     return this.searchForm.get('source')?.value ?? this.packageSources[0];
-  }
-
-  private listenForCategoryChanges() {
-    this.subscriptions.add(
-      this.packageManager.currentCategory.subscribe(() => {
-        this.refresh();
-      })
-    );
   }
 }
