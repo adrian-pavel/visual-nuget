@@ -6,11 +6,9 @@ import { PackageDependencyGroup } from 'src/app/models/package-meta';
   templateUrl: './package-details-dependencies.component.html',
   styleUrls: ['./package-details-dependencies.component.scss'],
 })
-export class PackageDetailsDependenciesComponent implements OnInit {
+export class PackageDetailsDependenciesComponent {
   @Input()
   public dependencyGroups: PackageDependencyGroup[] | undefined;
 
   constructor() {}
-
-  ngOnInit(): void {}
 }

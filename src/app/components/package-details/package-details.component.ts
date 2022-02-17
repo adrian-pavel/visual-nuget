@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { PackageRowModel } from 'src/app/models/package-details';
@@ -10,7 +10,7 @@ import { PackageManagerService } from 'src/app/services/package-manager.service'
   templateUrl: './package-details.component.html',
   styleUrls: ['./package-details.component.scss'],
 })
-export class PackageDetailsComponent implements OnInit {
+export class PackageDetailsComponent implements OnInit, OnDestroy {
   public package: PackageRowModel | null = null;
 
   public selectedVersion: FormControl = new FormControl();
