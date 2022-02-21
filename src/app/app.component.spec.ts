@@ -1,3 +1,4 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { Project } from 'src-ext/models/project';
 import { AppComponent } from './app.component';
@@ -18,6 +19,7 @@ describe('AppComponent', () => {
       TestBed.configureTestingModule({
         declarations: [AppComponent],
         providers: [{ provide: PackageManagerService, useValue: packageManagerMock }],
+        schemas: [NO_ERRORS_SCHEMA],
       }).compileComponents();
     })
   );
