@@ -5,11 +5,9 @@ import { Category } from '../models/category';
 import { PackageRowModel } from '../models/package-row-model';
 import { NUGET_ORG, PackageSource } from '../models/package-source';
 import { InstalledPackage, Project } from '../models/project';
+import { InstallMessage, UninstallMessage } from '../models/ui-message';
 import { NuGetApiService } from './nuget-api.service';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare function acquireVsCodeApi(): any;
-const vscode = acquireVsCodeApi();
+import { VscodeService } from './vscode.service';
 
 @Injectable({
   providedIn: 'root',
@@ -48,10 +46,10 @@ export class PackageManagerService {
   private _currentSource: PackageSource = NUGET_ORG;
   private _currentPrerelease = false;
 
-  constructor(private nugetService: NuGetApiService) {
+  constructor(private nugetService: NuGetApiService, private vscodeService: VscodeService) {
     // tell the extension to load the project and it's installed packages
     // now we are sure the UI is loaded and ready to receive the message
-    vscode.postMessage({
+    vscodeService.postMessage({
       command: 'load-project',
     });
   }
@@ -130,13 +128,13 @@ export class PackageManagerService {
     // if no specific version is provided just install the latest on the package
     const versionToInstall = version ?? packageToInstall.version;
 
-    vscode.postMessage({
+    this.vscodeService.postMessage({
       command: 'add-package',
       projectName: this._currentProject.value?.fsPath,
       packageId: packageToInstall.id,
       packageVersion: versionToInstall,
       packageSourceUrl: packageToInstall.sourceUrl,
-    });
+    } as InstallMessage);
   }
 
   public uninstallPackage(packageToUninstall: PackageRowModel | null) {
@@ -144,11 +142,11 @@ export class PackageManagerService {
       return;
     }
 
-    vscode.postMessage({
+    this.vscodeService.postMessage({
       command: 'remove-package',
       projectName: this._currentProject.value?.fsPath,
       packageId: packageToUninstall.id,
-    });
+    } as UninstallMessage);
   }
 
   private setInstalledInformation(packageRowModels: PackageRowModel[]): void {
