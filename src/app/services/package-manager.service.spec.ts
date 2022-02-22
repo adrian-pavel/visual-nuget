@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { skip } from 'rxjs';
+import { forkJoin, skip, zip } from 'rxjs';
 import { Category } from '../models/category';
 import { PackageSource } from '../models/package-source';
 import { NuGetApiService } from './nuget-api.service';
@@ -8,7 +8,15 @@ import { VscodeService } from './vscode.service';
 
 describe('PackageManagerService', () => {
   let service: PackageManagerService;
-  const nugetApiServiceMock = {};
+
+  const nugetApiServiceMock = {
+    search: jest.fn(() => {
+      return {
+        subscribe: jest.fn(),
+      };
+    }),
+    searchByPackageIds: jest.fn(),
+  };
 
   const vscodeServiceMock = {
     postMessage: jest.fn(),
@@ -73,5 +81,32 @@ describe('PackageManagerService', () => {
     });
 
     service.changeCurrentCategory(expectedCategory);
+  });
+
+  test('queryForPackages should set currents to null', (done) => {
+    const query = 'test';
+    const prerelease = false;
+    const source: PackageSource = {
+      name: 'nuget.org',
+      url: 'www.nuget.org',
+      authorizationHeader: undefined,
+    };
+
+    const observables = [service.currentSelectedPackage, service.currentSelectedPackageId, service.currentPackages];
+
+    zip(observables)
+      .pipe(skip(1))
+      .subscribe((results) => {
+        try {
+          expect(results[0]).toBeNull();
+          expect(results[1]).toBeNull();
+          expect(results[2]).toBeNull();
+          done();
+        } catch (error) {
+          done(error);
+        }
+      });
+
+    service.queryForPackages(query, prerelease, source);
   });
 });
