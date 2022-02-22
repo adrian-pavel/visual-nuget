@@ -151,43 +151,57 @@ describe('PackageManagerService', () => {
     service.queryForPackages(query, prerelease, source);
   });
 
-  test('queryForPackages should set current packages with installed info and filter results for category', (done) => {
-    const query = 'test';
-    const prerelease = true;
-    const source: PackageSource = getMockPackageSource();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  test.each<any>([
+    [Category.Installed, 2],
+    [Category.Updates, 1],
+  ])(
+    'queryForPackages should set current packages with installed info and filter results for category: %p',
+    (category: Category, expectedResultCount: number, done: jest.DoneCallback) => {
+      const query = 'test';
+      const prerelease = true;
+      const source: PackageSource = getMockPackageSource();
 
-    const currentProject: Project = getMockCurrentProject();
+      const currentProject: Project = getMockCurrentProject();
 
-    // set the current project so that we have installed packages
-    service.changeCurrentProject(currentProject);
+      // set the current project so that we have installed packages
+      service.changeCurrentProject(currentProject);
 
-    // set the current category to force result filtering and searching on package ids
-    service.changeCurrentCategory(Category.Updates);
+      // set the current category to force result filtering and searching on package ids
+      service.changeCurrentCategory(category);
 
-    // remove the third package for a realistic test scenario
-    const expectedPackagesFromApi: PackageRowModel[] = getMockApiPackages().slice(0, 2);
+      // remove the third package for a realistic test scenario
+      const expectedPackagesFromApi: PackageRowModel[] = getMockApiPackages().slice(0, 2);
 
-    service.currentPackages.pipe(skip(2)).subscribe((packages: PackageRowModel[] | null) => {
-      try {
-        expect(packages).not.toBeNull();
-        expect(packages?.length).toBe(1);
+      service.currentPackages.pipe(skip(2)).subscribe((packages: PackageRowModel[] | null) => {
+        try {
+          expect(packages).not.toBeNull();
+          expect(packages?.length).toBe(expectedResultCount);
 
-        const firstPackage = packages?.[0];
-        expect(firstPackage?.installedVersion).toBe(currentProject.packages[0].version);
-        expect(firstPackage?.isInstalled).toBe(true);
-        expect(firstPackage?.isOutdated).toBe(true);
+          const firstPackage = packages?.[0];
+          expect(firstPackage?.installedVersion).toBe(currentProject.packages[0].version);
+          expect(firstPackage?.isInstalled).toBe(true);
+          expect(firstPackage?.isOutdated).toBe(true);
 
-        expect(nugetApiServiceMock.search).toBeCalledTimes(0);
-        done();
-      } catch (error) {
-        done(error);
-      }
-    });
+          if (category === Category.Installed) {
+            const secondPackage = packages?.[1];
+            expect(secondPackage?.installedVersion).toBe(currentProject.packages[1].version);
+            expect(secondPackage?.isInstalled).toBe(true);
+            expect(secondPackage?.isOutdated).toBe(false);
+          }
 
-    nugetApiServiceMock.searchByPackageIds.mockReturnValue(of(expectedPackagesFromApi));
+          expect(nugetApiServiceMock.search).toBeCalledTimes(0);
+          done();
+        } catch (error) {
+          done(error);
+        }
+      });
 
-    service.queryForPackages(query, prerelease, source);
-  });
+      nugetApiServiceMock.searchByPackageIds.mockReturnValue(of(expectedPackagesFromApi));
+
+      service.queryForPackages(query, prerelease, source);
+    }
+  );
 
   function getMockApiPackages(): PackageRowModel[] {
     return [
