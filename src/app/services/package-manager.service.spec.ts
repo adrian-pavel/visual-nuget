@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { of, skip, zip } from 'rxjs';
+import { of, skip, take, zip } from 'rxjs';
 import { Category } from '../models/category';
 import { PackageRowModel } from '../models/package-row-model';
 import { PackageSource } from '../models/package-source';
@@ -78,6 +78,110 @@ describe('PackageManagerService', () => {
     });
 
     service.changeCurrentCategory(expectedCategory);
+  });
+
+  test('changeCurrentProject should emit new project and set installed info', (done) => {
+    const query = 'test';
+    const prerelease = false;
+    const source: PackageSource = getMockPackageSource();
+    const currentPackages: PackageRowModel[] = getMockApiPackages();
+
+    const expectedProject: Project = getMockCurrentProject();
+    // set current packages
+    nugetApiServiceMock.search.mockReturnValue(of(currentPackages));
+    service.queryForPackages(query, prerelease, source);
+
+    service.currentProject.pipe(skip(1)).subscribe((project: Project | null) => {
+      try {
+        expect(project).toBe(expectedProject);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+
+    service.changeCurrentProject(expectedProject);
+  });
+
+  test('changeCurrentSelectedPackage should emit reset current selected', (done) => {
+    const selectedPackage: PackageRowModel = getMockApiPackages()[0];
+
+    // set the versions to something other than undefined to avoid call to api
+    selectedPackage.versions = [];
+
+    const observables = [service.currentSelectedPackage, service.currentSelectedPackageId];
+
+    // skip the initial value of the BehaviorSubject and take just one to not get the actual package
+    zip(observables)
+      .pipe(skip(1), take(1))
+      .subscribe((results) => {
+        try {
+          expect(results[0]).toBeNull();
+          // the id is expected to be published for highlighting the row
+          expect(results[1]).toBe(selectedPackage.id);
+          done();
+        } catch (error) {
+          done(error);
+        }
+      });
+
+    service.changeCurrentSelectedPackage(selectedPackage);
+  });
+
+  test('changeCurrentSelectedPackage should emit the new package when versions present', (done) => {
+    const selectedPackage: PackageRowModel = getMockApiPackages()[0];
+
+    // set the versions to something other than undefined to avoid call to api
+    selectedPackage.versions = [];
+
+    // skip the initial value of the BehaviorSubject and reset
+    service.currentSelectedPackage.pipe(skip(2)).subscribe((result) => {
+      try {
+        expect(result).toBe(selectedPackage);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+
+    service.changeCurrentSelectedPackage(selectedPackage);
+  });
+
+  test('changeCurrentSelectedPackage should emit the new package after getting versions from api', (done) => {
+    const selectedPackage: PackageRowModel = getMockApiPackages()[0];
+
+    const packageFromApi = { ...selectedPackage };
+    packageFromApi.versions = [
+      {
+        '@id': 'versionid',
+        authors: [],
+        dependencyGroups: [],
+        description: 'versiondesc',
+        iconUrl: 'versionicon',
+        id: 'vid',
+        licenseUrl: 'versionLicenceUrl',
+        projectUrl: 'versionProjectUrl',
+        published: 'versionPublished',
+        tags: [],
+        version: '0.9.0',
+      },
+    ];
+
+    // skip the initial value of the BehaviorSubject and reset
+    service.currentSelectedPackage.pipe(skip(2)).subscribe((result) => {
+      try {
+        expect(result).toBe(selectedPackage);
+        expect(result?.versions).toBe(packageFromApi.versions);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+
+    // make the api service return the package with versions filled
+    nugetApiServiceMock.searchByPackageIds.mockReturnValue(of([packageFromApi]));
+
+    service.changeCurrentSelectedPackage(selectedPackage);
   });
 
   test('queryForPackages should set currents to null', (done) => {
@@ -202,6 +306,50 @@ describe('PackageManagerService', () => {
       service.queryForPackages(query, prerelease, source);
     }
   );
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  test.each<any>([
+    [undefined, '1.0.0'],
+    ['0.8.0', '0.8.0'],
+  ])('installPackage should call postMessage with correct version', (callingVersion: string, expectedVersion: string) => {
+    const packageToInstall = getMockApiPackages()[0];
+
+    const currentProject = getMockCurrentProject();
+
+    service.changeCurrentProject(currentProject);
+
+    vscodeServiceMock.postMessage.mockClear();
+
+    service.installPackage(packageToInstall, callingVersion);
+
+    expect(vscodeServiceMock.postMessage).toBeCalledTimes(1);
+    expect(vscodeServiceMock.postMessage).toBeCalledWith({
+      command: 'add-package',
+      projectName: currentProject.fsPath,
+      packageId: packageToInstall.id,
+      packageVersion: expectedVersion,
+      packageSourceUrl: packageToInstall.sourceUrl,
+    });
+  });
+
+  test('installPackage should call postMessage with correct version', () => {
+    const packageToUninstall = getMockApiPackages()[0];
+
+    const currentProject = getMockCurrentProject();
+
+    service.changeCurrentProject(currentProject);
+
+    vscodeServiceMock.postMessage.mockClear();
+
+    service.uninstallPackage(packageToUninstall);
+
+    expect(vscodeServiceMock.postMessage).toBeCalledTimes(1);
+    expect(vscodeServiceMock.postMessage).toBeCalledWith({
+      command: 'remove-package',
+      projectName: currentProject.fsPath,
+      packageId: packageToUninstall.id,
+    });
+  });
 
   function getMockApiPackages(): PackageRowModel[] {
     return [
