@@ -40,3 +40,9 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.checkbox-with-label {
+  align-self: center;
+  display: flex;
+  align-items: flex-start;
+}

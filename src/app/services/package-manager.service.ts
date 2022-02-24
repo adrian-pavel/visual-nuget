@@ -137,6 +137,10 @@ export class PackageManagerService {
     } as InstallMessage);
   }
 
+  public installPackages(packagesToInstall: PackageRowModel[]) {
+    console.log('Packages to install: ', packagesToInstall);
+  }
+
   public uninstallPackage(packageToUninstall: PackageRowModel | null) {
     if (packageToUninstall === null) {
       return;
