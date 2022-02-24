@@ -14,8 +14,8 @@ export class AppComponent {
   constructor(private packageManager: PackageManagerService) {}
 
   @HostListener('window:message', ['$event'])
-  MessageFromExtension(event: MessageEvent) {
-    const message = event.data as Message;
+  MessageFromExtension(event: MessageEvent<Message>) {
+    const message = event.data;
     if (message.type === 'project') {
       this.packageManager.changeCurrentProject(message.data as Project);
     } else if (message.type === 'sources') {
