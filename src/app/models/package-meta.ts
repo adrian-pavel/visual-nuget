@@ -26,6 +26,7 @@ export interface CatalogEntry {
   tags: string | string[];
   dependencyGroups: PackageDependencyGroup[] | undefined;
   published: string;
+  listed: boolean;
 }
 
 export interface PackageDependencyGroup {

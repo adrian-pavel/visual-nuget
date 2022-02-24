@@ -160,6 +160,11 @@ export class NuGetApiService {
       );
     }
 
+    // filter out unlisted packages, compare with false explicitly since undefined means it's true/listed
+    filteredRegistrationLeafs = filteredRegistrationLeafs.filter(
+      (registrationLeaf: RegistrationLeaf): boolean => registrationLeaf.catalogEntry.listed !== false
+    );
+
     const allCatalogEntries = filteredRegistrationLeafs.map((registrationLeaf: RegistrationLeaf): CatalogEntry => registrationLeaf.catalogEntry);
 
     allCatalogEntries.sort((entry1: CatalogEntry, entry2: CatalogEntry): number => {
