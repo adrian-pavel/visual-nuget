@@ -7,3 +7,6 @@ src-ext
 .gitignore
 tsconfig**.json
 **/**.js.map
+coverage
+**jest**.ts
+angular.json
