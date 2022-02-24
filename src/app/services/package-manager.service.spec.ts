@@ -164,6 +164,8 @@ describe('PackageManagerService', () => {
         published: 'versionPublished',
         tags: [],
         version: '0.9.0',
+        listed: true,
+        vulnerabilities: undefined,
       },
     ];
 
