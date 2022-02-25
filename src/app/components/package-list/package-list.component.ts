@@ -52,8 +52,6 @@ export class PackageListComponent extends BaseComponent implements OnInit {
   }
 
   public rowSelectChange(packageRow: PackageRowModel, isSelected: boolean): void {
-    console.log('Row select change: ', packageRow, isSelected);
-
     isSelected ? this.selectionService.select(packageRow) : this.selectionService.deselect(packageRow);
   }
 

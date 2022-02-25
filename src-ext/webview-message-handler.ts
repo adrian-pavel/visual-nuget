@@ -2,14 +2,17 @@ import * as vscode from 'vscode';
 import { InstallMessage, UIMessage, UninstallMessage } from './models/ui-message';
 
 import ProjectFileLoader from './project-file-loader';
+import { TaskManager } from './task-manager';
 
 export default class WebviewMessageHandler {
   private readonly disposables: vscode.Disposable[] = [];
   private readonly projectFileLoader: ProjectFileLoader;
+  private readonly taskManager: TaskManager;
   private readonly taskName = 'visual-nuget';
 
   public constructor(private readonly webview: vscode.Webview, private readonly projectFilePath: string) {
     this.projectFileLoader = new ProjectFileLoader();
+    this.taskManager = new TaskManager(() => this.loadProject());
 
     this.webview.onDidReceiveMessage(
       (message: UIMessage) => {
@@ -18,17 +21,6 @@ export default class WebviewMessageHandler {
       null,
       this.disposables
     );
-
-    this.handleFinishedTasks();
-  }
-
-  private handleFinishedTasks(): void {
-    vscode.tasks.onDidEndTask((taskEvent: vscode.TaskEndEvent) => {
-      const task = taskEvent.execution.task;
-      if (task.name === this.taskName) {
-        this.loadProject();
-      }
-    });
   }
 
   private handleMessage(message: UIMessage): void {
@@ -66,7 +58,7 @@ export default class WebviewMessageHandler {
       'dotnet',
       new vscode.ShellExecution('dotnet', args)
     );
-    vscode.tasks.executeTask(task).then();
+    this.taskManager.executeTask(task);
   }
 
   private removePackage(message: UninstallMessage): void {
@@ -79,7 +71,7 @@ export default class WebviewMessageHandler {
       'dotnet',
       new vscode.ShellExecution('dotnet', args)
     );
-    vscode.tasks.executeTask(task).then();
+    this.taskManager.executeTask(task);
   }
 
   private loadProject(): void {

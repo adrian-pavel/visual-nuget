@@ -125,20 +125,19 @@ export class PackageManagerService {
       return;
     }
 
-    // if no specific version is provided just install the latest on the package
-    const versionToInstall = version ?? packageToInstall.version;
+    const installMessage = this.mapPackageToInstallMessage(packageToInstall, version);
 
-    this.vscodeService.postMessage({
-      command: 'add-package',
-      projectName: this._currentProject.value?.fsPath,
-      packageId: packageToInstall.id,
-      packageVersion: versionToInstall,
-      packageSourceUrl: packageToInstall.sourceUrl,
-    } as InstallMessage);
+    this.vscodeService.postMessage(installMessage);
   }
 
   public installPackages(packagesToInstall: PackageRowModel[]) {
-    console.log('Packages to install: ', packagesToInstall);
+    if (packagesToInstall.length <= 0) {
+      return;
+    }
+
+    const installMessages = packagesToInstall.map((p) => this.mapPackageToInstallMessage(p));
+
+    this.vscodeService.postMessages(installMessages);
   }
 
   public uninstallPackage(packageToUninstall: PackageRowModel | null) {
@@ -151,6 +150,24 @@ export class PackageManagerService {
       projectName: this._currentProject.value?.fsPath,
       packageId: packageToUninstall.id,
     } as UninstallMessage);
+  }
+
+  private mapPackageToInstallMessage(packageToInstall: PackageRowModel, version?: string): InstallMessage {
+    const currentProject = this._currentProject.value;
+    if (!currentProject) {
+      throw new Error('Current project cannot be undefined');
+    }
+
+    // if no specific version is provided just install the latest on the package
+    const versionToInstall = version ?? packageToInstall.version;
+
+    return {
+      command: 'add-package',
+      projectName: currentProject.fsPath,
+      packageId: packageToInstall.id,
+      packageVersion: versionToInstall,
+      packageSourceUrl: packageToInstall.sourceUrl,
+    };
   }
 
   private setInstalledInformation(packageRowModels: PackageRowModel[]): void {
