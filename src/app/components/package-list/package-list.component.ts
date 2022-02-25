@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Category } from 'src/app/models/category';
 import { PackageRowModel } from 'src/app/models/package-row-model';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
+import { SelectionService } from 'src/app/services/selection.service';
 
 import { BaseComponent } from '../base-component';
 
@@ -9,6 +10,7 @@ import { BaseComponent } from '../base-component';
   selector: 'app-package-list',
   templateUrl: './package-list.component.html',
   styleUrls: ['./package-list.component.scss'],
+  providers: [SelectionService],
 })
 export class PackageListComponent extends BaseComponent implements OnInit {
   private currentSelectedCategory: Category = Category.Browse;
@@ -21,7 +23,14 @@ export class PackageListComponent extends BaseComponent implements OnInit {
     return this.currentSelectedCategory === Category.Updates && this.packages !== null && this.packages.length > 0;
   }
 
-  constructor(private packageManager: PackageManagerService) {
+  public get areAllSelected(): boolean {
+    if (this.packages === null) {
+      return false;
+    }
+    return this.selectionService.areAllSelected(this.packages);
+  }
+
+  constructor(private packageManager: PackageManagerService, public selectionService: SelectionService<PackageRowModel>) {
     super();
   }
 
@@ -31,8 +40,25 @@ export class PackageListComponent extends BaseComponent implements OnInit {
     this.listenForSelectedCategory();
   }
 
+  public selectAll(event: MouseEvent): void {
+    const isSelected = (event.target as HTMLInputElement).checked;
+    if (isSelected) {
+      if (this.packages !== null) {
+        this.selectionService.selectAll(this.packages);
+      }
+    } else {
+      this.selectionService.clear();
+    }
+  }
+
+  public rowSelectChange(packageRow: PackageRowModel, isSelected: boolean): void {
+    console.log('Row select change: ', packageRow, isSelected);
+
+    isSelected ? this.selectionService.select(packageRow) : this.selectionService.deselect(packageRow);
+  }
+
   public updateSelected(): void {
-    this.packageManager.installPackages([]);
+    this.packageManager.installPackages(this.selectionService.selected);
   }
 
   private listenForCurrentPackages(): void {

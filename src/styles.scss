@@ -45,4 +45,8 @@ body {
   align-self: center;
   display: flex;
   align-items: flex-start;
+
+  label {
+    margin-left: 0.5rem;
+  }
 }

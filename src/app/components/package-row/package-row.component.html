@@ -1,4 +1,5 @@
-<div *ngIf="package" class="package-row" [ngClass]="{ active: isActive }" (click)="select()">
+<div *ngIf="package" class="package-row" [ngClass]="{ active: isActive }" (click)="click()">
+  <input *ngIf="showSelectionCheckbox" class="select-checkbox" type="checkbox" [checked]="isSelected" (click)="select($event)" />
   <div class="icon">
     <img *ngIf="package.iconUrl" [src]="package.iconUrl" (error)="package.iconUrl = ''" />
     <fa-icon class="placeholder-icon" *ngIf="!package.iconUrl" icon="cubes"></fa-icon>

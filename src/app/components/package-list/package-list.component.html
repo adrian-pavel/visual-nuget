@@ -1,7 +1,7 @@
 <ng-container *ngIf="showSelectCheckboxes">
   <div class="select-all">
     <span class="checkbox-with-label">
-      <input type="checkbox" id="selectAll" />
+      <input type="checkbox" id="selectAll" [checked]="areAllSelected" (click)="selectAll($event)" />
       <label for="selectAll">Select all</label>
     </span>
     <button class="button" (click)="updateSelected()">Update</button>
@@ -9,7 +9,14 @@
   <hr />
 </ng-container>
 <section *ngIf="packages && packages.length" class="package-list">
-  <app-package-row *ngFor="let package of packages" [package]="package" [isActive]="package.id === currentSelectedPackageId"></app-package-row>
+  <app-package-row
+    *ngFor="let package of packages"
+    [package]="package"
+    [isActive]="package.id === currentSelectedPackageId"
+    [isSelected]="selectionService.isSelected(package)"
+    [showSelectionCheckbox]="showSelectCheckboxes"
+    (changeSelect)="rowSelectChange(package, $event)"
+  ></app-package-row>
 </section>
 
 <div *ngIf="packages && !packages.length" class="no-packages">No packages found for this query.</div>

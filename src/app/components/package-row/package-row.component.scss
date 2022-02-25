@@ -18,6 +18,10 @@
     color: var(--vscode-list-activeSelectionForeground);
   }
 
+  .select-checkbox {
+    align-self: center;
+  }
+
   .icon {
     position: relative;
     $icon-size: 40px;
