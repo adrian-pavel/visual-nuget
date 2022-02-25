@@ -23,6 +23,10 @@ body {
       background-color: var(--vscode-button-secondaryHoverBackground);
     }
   }
+
+  &:disabled {
+    background-color: darkgray;
+  }
 }
 
 .drop-down {
