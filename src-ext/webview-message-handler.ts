@@ -1,5 +1,7 @@
+import { ExtensionMessage } from 'src-common/models/extension-message';
+import { PackageSource } from 'src-common/models/package-source';
+import { InstallMessage, UIMessage, UninstallMessage } from 'src-common/models/ui-message';
 import * as vscode from 'vscode';
-import { InstallMessage, UIMessage, UninstallMessage } from './models/ui-message';
 
 import ProjectFileLoader from './project-file-loader';
 import { TaskManager } from './task-manager';
@@ -76,7 +78,8 @@ export default class WebviewMessageHandler {
 
   private loadProject(): void {
     this.projectFileLoader.loadProjectAsync(this.projectFilePath).then((project) => {
-      this.webview.postMessage({ type: 'project', data: project });
+      const message: ExtensionMessage = { type: 'project', data: project };
+      this.webview.postMessage(message);
     });
   }
 
@@ -88,11 +91,13 @@ export default class WebviewMessageHandler {
       const sources = [];
 
       for (const sourceSt of sourcesStrings) {
-        const source = JSON.parse(sourceSt);
+        const source = JSON.parse(sourceSt) as PackageSource;
         sources.push(source);
       }
 
-      this.webview.postMessage({ type: 'sources', data: sources });
+      const message: ExtensionMessage = { type: 'sources', data: sources };
+
+      this.webview.postMessage(message);
     } catch (error) {
       vscode.window.showErrorMessage(`Error parsing Visual NuGet settings: ${error}`);
     }

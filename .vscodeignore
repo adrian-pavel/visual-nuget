@@ -3,6 +3,7 @@
 node_modules
 src
 src-ext
+src-common
 .browserslistrc
 .gitignore
 tsconfig**.json

@@ -3,11 +3,12 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 import { Category } from '../models/category';
 import { PackageRowModel } from '../models/package-row-model';
-import { NUGET_ORG, PackageSource } from '../models/package-source';
-import { InstalledPackage, Project } from '../models/project';
-import { InstallMessage, UninstallMessage } from '../models/ui-message';
+import { PackageSource } from '../../../src-common/models/package-source';
+import { InstalledPackage, Project } from '../../../src-common/models/project';
+import { InstallMessage, UninstallMessage } from '../../../src-common/models/ui-message';
 import { NuGetApiService } from './nuget-api.service';
 import { VscodeService } from './vscode.service';
+import { NUGET_ORG } from '../models/constants';
 
 @Injectable({
   providedIn: 'root',

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
-import { NUGET_ORG, PackageSource } from 'src/app/models/package-source';
+import { NUGET_ORG } from 'src/app/models/constants';
+import { PackageSource } from 'src-common/models/package-source';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
 
 import { BaseComponent } from '../base-component';

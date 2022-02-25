@@ -1,7 +1,7 @@
 import { PackageSource } from './package-source';
 import { Project } from './project';
 
-export interface Message {
+export interface ExtensionMessage {
   type: string;
   data: Project | PackageSource[];
 }
