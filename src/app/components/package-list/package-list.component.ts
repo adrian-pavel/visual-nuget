@@ -59,11 +59,13 @@ export class PackageListComponent extends BaseComponent implements OnInit {
 
   public updateSelected(): void {
     this.packageManager.installPackages(this.selectionService.selected);
+    this.selectionService.clear();
   }
 
   private listenForCurrentPackages(): void {
     this.subscriptions.add(
       this.packageManager.currentPackages.subscribe((packages: PackageRowModel[] | null) => {
+        this.selectionService.clear();
         this.packages = packages;
       })
     );
