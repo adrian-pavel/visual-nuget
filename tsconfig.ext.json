@@ -8,7 +8,7 @@
     "rootDir": ".",
     "strict": true
   },
-  "include": ["src-ext"],
+  "include": ["src-ext/**/*", "src-common/**/*"],
   "exclude": ["node_modules", ".vscode-test"],
   "watchOptions": {
     "watchFile": "useFsEvents",
