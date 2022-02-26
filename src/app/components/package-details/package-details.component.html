@@ -19,6 +19,7 @@
     <button class="button" (click)="install()">{{ package.isInstalled ? 'Update' : 'Install' }}</button>
   </div>
   <ng-container *ngIf="selectedVersionObject">
+    <app-package-details-vulnerabilities [vulnerabilities]="selectedVersionObject.vulnerabilities"></app-package-details-vulnerabilities>
     <div class="description">
       <p class="label">Description</p>
       <p class="description-text">{{ selectedVersionObject.description }}</p>

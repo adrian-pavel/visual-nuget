@@ -6,7 +6,7 @@ import { coerce, prerelease, rcompare } from 'semver';
 import { ApiIndexResponse, ApiResource } from '../models/api-index-response';
 import { PackageRowModel } from '../models/package-row-model';
 import { CatalogEntry, PackageMetaResponse, RegistrationLeaf, RegistrationPage } from '../models/package-meta';
-import { PackageSource } from '../models/package-source';
+import { PackageSource } from '../../../src-common/models/package-source';
 import { PackageSearchResult, SearchResults } from '../models/search-results';
 
 @Injectable({
@@ -159,6 +159,11 @@ export class NuGetApiService {
         (registrationLeaf: RegistrationLeaf): boolean => prerelease(registrationLeaf.catalogEntry.version) === null
       );
     }
+
+    // filter out unlisted packages, compare with false explicitly since undefined means it's true/listed
+    filteredRegistrationLeafs = filteredRegistrationLeafs.filter(
+      (registrationLeaf: RegistrationLeaf): boolean => registrationLeaf.catalogEntry.listed !== false
+    );
 
     const allCatalogEntries = filteredRegistrationLeafs.map((registrationLeaf: RegistrationLeaf): CatalogEntry => registrationLeaf.catalogEntry);
 

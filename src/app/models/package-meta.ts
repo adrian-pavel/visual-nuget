@@ -26,6 +26,8 @@ export interface CatalogEntry {
   tags: string | string[];
   dependencyGroups: PackageDependencyGroup[] | undefined;
   published: string;
+  listed: boolean;
+  vulnerabilities: Vulnerability[] | undefined;
 }
 
 export interface PackageDependencyGroup {
@@ -36,4 +38,9 @@ export interface PackageDependencyGroup {
 export interface PackageDependency {
   id: string;
   range: string;
+}
+
+export interface Vulnerability {
+  advisoryUrl: string;
+  severity: string;
 }

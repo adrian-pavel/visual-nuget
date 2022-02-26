@@ -1,3 +1,21 @@
+.select-all {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 0.5rem;
+  padding-right: 1rem;
+
+  .button {
+    height: 27px;
+    width: 70px;
+  }
+}
+
+hr {
+  border: 0;
+  border-top: 1px inset;
+}
+
 .package-list {
   display: flex;
   height: 100%;

@@ -2,8 +2,7 @@
 import * as fs from 'fs';
 import * as xml2js from 'xml2js';
 import * as path from 'path';
-
-import { Package, Project } from './models/project';
+import { InstalledPackage, Project } from '../src-common/models/project';
 
 export default class ProjectFileLoader {
   public async loadProjectAsync(projectFilePath: string): Promise<Project> {
@@ -19,7 +18,7 @@ export default class ProjectFileLoader {
     };
   }
 
-  private async readPackagesAsync(projectContent: string): Promise<Package[]> {
+  private async readPackagesAsync(projectContent: string): Promise<InstalledPackage[]> {
     const parsedXml = await xml2js.parseStringPromise(projectContent);
     if (!parsedXml.Project.ItemGroup) {
       return [];

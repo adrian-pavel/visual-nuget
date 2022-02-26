@@ -15,9 +15,11 @@ import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 import { PackageDetailsDependenciesComponent } from './components/package-details-dependencies/package-details-dependencies.component';
 import { VersionRangePipe } from './pipes/version-range.pipe';
+import { PackageDetailsVulnerabilitiesComponent } from './components/package-details-vulnerabilities/package-details-vulnerabilities.component';
+import { SeverityPipe } from './pipes/severity.pipe';
 
 @NgModule({
-  declarations: [AppComponent, NavBarComponent, ToolBarComponent, PackageRowComponent, PackageListComponent, PackageDetailsComponent, ShortNumberPipe, LoadingSpinnerComponent, PackageDetailsDependenciesComponent, VersionRangePipe],
+  declarations: [AppComponent, NavBarComponent, ToolBarComponent, PackageRowComponent, PackageListComponent, PackageDetailsComponent, ShortNumberPipe, LoadingSpinnerComponent, PackageDetailsDependenciesComponent, VersionRangePipe, PackageDetailsVulnerabilitiesComponent, SeverityPipe],
   imports: [BrowserModule, HttpClientModule, ReactiveFormsModule, FontAwesomeModule],
   providers: [],
   bootstrap: [AppComponent],

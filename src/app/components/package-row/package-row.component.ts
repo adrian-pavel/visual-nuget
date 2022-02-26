@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PackageRowModel } from 'src/app/models/package-row-model';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
 
@@ -14,9 +14,24 @@ export class PackageRowComponent {
   @Input()
   public package: PackageRowModel | null = null;
 
+  @Input()
+  public showSelectionCheckbox = false;
+
+  @Input()
+  public isSelected = false;
+
+  @Output()
+  public changeSelect = new EventEmitter<boolean>();
+
   constructor(private packageManager: PackageManagerService) {}
 
-  public select(): void {
+  public select(event: MouseEvent): void {
+    event.stopPropagation();
+    const newValue = (event.target as HTMLInputElement).checked;
+    this.changeSelect.emit(newValue);
+  }
+
+  public click(): void {
     this.packageManager.changeCurrentSelectedPackage(this.package);
   }
 

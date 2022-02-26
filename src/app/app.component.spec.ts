@@ -1,10 +1,10 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { Project } from 'src-ext/models/project';
 import { AppComponent } from './app.component';
-import { Message } from './models/message';
-import { PackageSource } from './models/package-source';
+import { ExtensionMessage } from '../../src-common/models/extension-message';
+import { PackageSource } from '../../src-common/models/package-source';
 import { PackageManagerService } from './services/package-manager.service';
+import { Project } from 'src-common/models/project';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -35,7 +35,7 @@ describe('AppComponent', () => {
   });
 
   test('should call change current project', () => {
-    const event = new MessageEvent<Message>('message', {
+    const event = new MessageEvent<ExtensionMessage>('message', {
       data: {
         type: 'project',
         data: {
@@ -52,7 +52,7 @@ describe('AppComponent', () => {
   });
 
   test('should call change current sources', () => {
-    const event = new MessageEvent<Message>('message', {
+    const event = new MessageEvent<ExtensionMessage>('message', {
       data: {
         type: 'sources',
         data: [

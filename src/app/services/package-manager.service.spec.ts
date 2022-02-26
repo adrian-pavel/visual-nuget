@@ -2,8 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { of, skip, take, zip } from 'rxjs';
 import { Category } from '../models/category';
 import { PackageRowModel } from '../models/package-row-model';
-import { PackageSource } from '../models/package-source';
-import { Project } from '../models/project';
+import { PackageSource } from '../../../src-common/models/package-source';
+import { Project } from '../../../src-common/models/project';
 import { NuGetApiService } from './nuget-api.service';
 import { PackageManagerService } from './package-manager.service';
 import { VscodeService } from './vscode.service';
@@ -149,6 +149,7 @@ describe('PackageManagerService', () => {
 
   test('changeCurrentSelectedPackage should emit the new package after getting versions from api', (done) => {
     const selectedPackage: PackageRowModel = getMockApiPackages()[0];
+    const source: PackageSource = getMockPackageSource();
 
     const packageFromApi = { ...selectedPackage };
     packageFromApi.versions = [
@@ -164,8 +165,17 @@ describe('PackageManagerService', () => {
         published: 'versionPublished',
         tags: [],
         version: '0.9.0',
+        listed: true,
+        vulnerabilities: undefined,
       },
     ];
+
+    nugetApiServiceMock.search.mockReturnValue({
+      subscribe: jest.fn(),
+    });
+
+    // need to do a search first like would happen in a real scenario to set the current source
+    service.queryForPackages('', false, source);
 
     // skip the initial value of the BehaviorSubject and reset
     service.currentSelectedPackage.pipe(skip(2)).subscribe((result) => {

@@ -1,8 +1,4 @@
-export interface PackageSource {
-  name: string;
-  url: string;
-  authorizationHeader: string | undefined;
-}
+import { PackageSource } from '../../../src-common/models/package-source';
 
 export const NUGET_ORG: PackageSource = {
   name: 'nuget.org',

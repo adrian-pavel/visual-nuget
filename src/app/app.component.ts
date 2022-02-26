@@ -1,8 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 
-import { Message } from './models/message';
-import { PackageSource } from './models/package-source';
-import { Project } from './models/project';
+import { ExtensionMessage } from '../../src-common/models/extension-message';
+import { PackageSource } from '../../src-common/models/package-source';
+import { Project } from '../../src-common/models/project';
 import { PackageManagerService } from './services/package-manager.service';
 
 @Component({
@@ -14,7 +14,7 @@ export class AppComponent {
   constructor(private packageManager: PackageManagerService) {}
 
   @HostListener('window:message', ['$event'])
-  MessageFromExtension(event: MessageEvent<Message>) {
+  MessageFromExtension(event: MessageEvent<ExtensionMessage>) {
     const message = event.data;
     if (message.type === 'project') {
       this.packageManager.changeCurrentProject(message.data as Project);

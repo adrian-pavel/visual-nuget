@@ -1,0 +1,11 @@
+<div *ngIf="vulnerabilities" class="vulnerabilities-container">
+  <div class="header">
+    <fa-icon class="warning-icon" icon="triangle-exclamation"></fa-icon>
+    <span class="label">Vulnerabilities detected ({{ vulnerabilities.length }})</span>
+  </div>
+  <div class="explanation">This package version has vulnerabilities. Read the advisories and decide if you should switch to another version.</div>
+  <div *ngFor="let vulnerability of vulnerabilities" class="vulnerability">
+    <span class="label">Advisory ({{ vulnerability.severity | severity }}):</span>
+    <a [href]="vulnerability.advisoryUrl">{{ vulnerability.advisoryUrl }}</a>
+  </div>
+</div>

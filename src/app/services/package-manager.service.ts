@@ -3,11 +3,12 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 import { Category } from '../models/category';
 import { PackageRowModel } from '../models/package-row-model';
-import { NUGET_ORG, PackageSource } from '../models/package-source';
-import { InstalledPackage, Project } from '../models/project';
-import { InstallMessage, UninstallMessage } from '../models/ui-message';
+import { PackageSource } from '../../../src-common/models/package-source';
+import { InstalledPackage, Project } from '../../../src-common/models/project';
+import { InstallMessage, UninstallMessage } from '../../../src-common/models/ui-message';
 import { NuGetApiService } from './nuget-api.service';
 import { VscodeService } from './vscode.service';
+import { NUGET_ORG } from '../models/constants';
 
 @Injectable({
   providedIn: 'root',
@@ -43,7 +44,7 @@ export class PackageManagerService {
     return this._currentSelectedPackageId.asObservable();
   }
 
-  private _currentSource: PackageSource = NUGET_ORG;
+  private _currentSource: PackageSource | undefined;
   private _currentPrerelease = false;
 
   constructor(private nugetService: NuGetApiService, private vscodeService: VscodeService) {
@@ -107,7 +108,7 @@ export class PackageManagerService {
     // if no package selected or if the versions/metadata for the package are already loaded, just display it
     if (selectedPackage == null || selectedPackage.versions !== undefined) {
       this._currentSelectedPackage.next(selectedPackage);
-    } else {
+    } else if (this._currentSource) {
       // else query the api for the package metadata and use the versions from the result
       this.nugetService.searchByPackageIds([selectedPackage?.id], '', this._currentPrerelease, this._currentSource).subscribe((results) => {
         selectedPackage.versions = results[0].versions;
@@ -125,16 +126,19 @@ export class PackageManagerService {
       return;
     }
 
-    // if no specific version is provided just install the latest on the package
-    const versionToInstall = version ?? packageToInstall.version;
+    const installMessage = this.mapPackageToInstallMessage(packageToInstall, version);
 
-    this.vscodeService.postMessage({
-      command: 'add-package',
-      projectName: this._currentProject.value?.fsPath,
-      packageId: packageToInstall.id,
-      packageVersion: versionToInstall,
-      packageSourceUrl: packageToInstall.sourceUrl,
-    } as InstallMessage);
+    this.vscodeService.postMessage(installMessage);
+  }
+
+  public installPackages(packagesToInstall: PackageRowModel[]) {
+    if (packagesToInstall.length <= 0) {
+      return;
+    }
+
+    const installMessages = packagesToInstall.map((p) => this.mapPackageToInstallMessage(p));
+
+    this.vscodeService.postMessages(installMessages);
   }
 
   public uninstallPackage(packageToUninstall: PackageRowModel | null) {
@@ -147,6 +151,24 @@ export class PackageManagerService {
       projectName: this._currentProject.value?.fsPath,
       packageId: packageToUninstall.id,
     } as UninstallMessage);
+  }
+
+  private mapPackageToInstallMessage(packageToInstall: PackageRowModel, version?: string): InstallMessage {
+    const currentProject = this._currentProject.value;
+    if (!currentProject) {
+      throw new Error('Current project cannot be undefined');
+    }
+
+    // if no specific version is provided just install the latest on the package
+    const versionToInstall = version ?? packageToInstall.version;
+
+    return {
+      command: 'add-package',
+      projectName: currentProject.fsPath,
+      packageId: packageToInstall.id,
+      packageVersion: versionToInstall,
+      packageSourceUrl: packageToInstall.sourceUrl,
+    };
   }
 
   private setInstalledInformation(packageRowModels: PackageRowModel[]): void {
