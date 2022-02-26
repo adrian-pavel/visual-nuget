@@ -44,6 +44,13 @@ Use this string when defining the source in the Settings.
 
 ## Release notes
 
+### v0.2.0
+
+- ### **nuget.org is in the settings now so that it can be replaced if needed (possible breaking change, need to reset the settings and re-add private sources)**
+- filter out unlisted packages
+- display package version vulnerabilities
+- Update tab select multiple and update to latest version in one click
+
 ### v0.1.3
 
 - minor bug fixes
