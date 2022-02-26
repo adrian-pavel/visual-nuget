@@ -65,6 +65,9 @@
           "items": {
             "type": "string"
           },
+          "default": [
+            "{\"name\": \"nuget.orgSet\",\"url\": \"https://api.nuget.org/v3/index.json\"}"
+          ],
           "uniqueItems": true,
           "markdownDescription": "Each source needs to be it's own item in the list.  eg.: {\"name\": \"MyAwesomeServer\",\"url\": \"https://myPrivateNugetServer.com/v3/index.json\", \"authorizationHeader\": \"Basic VnNzU2Vzc2lvblRva2VuOk15TmV3bHlDcmVhdGVkUEFU\"}"
         }

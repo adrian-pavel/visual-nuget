@@ -149,6 +149,7 @@ describe('PackageManagerService', () => {
 
   test('changeCurrentSelectedPackage should emit the new package after getting versions from api', (done) => {
     const selectedPackage: PackageRowModel = getMockApiPackages()[0];
+    const source: PackageSource = getMockPackageSource();
 
     const packageFromApi = { ...selectedPackage };
     packageFromApi.versions = [
@@ -168,6 +169,13 @@ describe('PackageManagerService', () => {
         vulnerabilities: undefined,
       },
     ];
+
+    nugetApiServiceMock.search.mockReturnValue({
+      subscribe: jest.fn(),
+    });
+
+    // need to do a search first like would happen in a real scenario to set the current source
+    service.queryForPackages('', false, source);
 
     // skip the initial value of the BehaviorSubject and reset
     service.currentSelectedPackage.pipe(skip(2)).subscribe((result) => {

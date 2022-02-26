@@ -44,7 +44,7 @@ export class PackageManagerService {
     return this._currentSelectedPackageId.asObservable();
   }
 
-  private _currentSource: PackageSource = NUGET_ORG;
+  private _currentSource: PackageSource | undefined;
   private _currentPrerelease = false;
 
   constructor(private nugetService: NuGetApiService, private vscodeService: VscodeService) {
@@ -108,7 +108,7 @@ export class PackageManagerService {
     // if no package selected or if the versions/metadata for the package are already loaded, just display it
     if (selectedPackage == null || selectedPackage.versions !== undefined) {
       this._currentSelectedPackage.next(selectedPackage);
-    } else {
+    } else if (this._currentSource) {
       // else query the api for the package metadata and use the versions from the result
       this.nugetService.searchByPackageIds([selectedPackage?.id], '', this._currentPrerelease, this._currentSource).subscribe((results) => {
         selectedPackage.versions = results[0].versions;

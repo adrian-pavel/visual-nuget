@@ -1,4 +1,4 @@
-<section class="toolbar" aria-label="main toolbar" [formGroup]="searchForm">
+<section *ngIf="searchForm" class="toolbar" aria-label="main toolbar" [formGroup]="searchForm">
   <div class="toolbar-start">
     <input type="search" class="search-box" placeholder="Search" formControlName="query" />
     <button type="button" class="button secondary" (click)="refresh()">
