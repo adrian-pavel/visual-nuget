@@ -44,6 +44,14 @@ Use this string when defining the source in the Settings.
 
 ## Release notes
 
+### v0.2.1
+
+- added verified icon to verified packages
+- added panel resizing for package list and details
+- added settings button next to sources
+- automatically update sources once settings are changed
+- display correct formatting for package description in details panel
+
 ### v0.2.0
 
 - ### **nuget.org is in the settings now so that it can be replaced if needed (possible breaking change, need to reset the settings and re-add private sources)**
