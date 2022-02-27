@@ -23,6 +23,14 @@ export default class WebviewMessageHandler {
       null,
       this.disposables
     );
+
+    vscode.workspace.onDidChangeConfiguration(
+      () => {
+        this.loadConfiguration();
+      },
+      null,
+      this.disposables
+    );
   }
 
   private handleMessage(message: UIMessage): void {
