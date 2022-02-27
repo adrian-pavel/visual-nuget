@@ -11,11 +11,12 @@
   </div>
 
   <div class="toolbar-end">
-    <div class="navbar-item">
-      <span class="source-title">Package source:</span>
-      <select class="drop-down" formControlName="source">
-        <option *ngFor="let pkgSource of packageSources" [ngValue]="pkgSource">{{ pkgSource.name }}</option>
-      </select>
-    </div>
+    <span class="source-title">Package source:</span>
+    <select class="drop-down" formControlName="source">
+      <option *ngFor="let pkgSource of packageSources" [ngValue]="pkgSource">{{ pkgSource.name }}</option>
+    </select>
+    <button type="button" class="button secondary" (click)="openSettings()">
+      <fa-icon icon="gear"></fa-icon>
+    </button>
   </div>
 </section>

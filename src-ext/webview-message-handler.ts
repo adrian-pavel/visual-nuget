@@ -37,6 +37,8 @@ export default class WebviewMessageHandler {
         this.loadProject();
         this.loadConfiguration();
         return;
+      case 'open-settings':
+        this.openSettings();
     }
   }
 
@@ -101,6 +103,10 @@ export default class WebviewMessageHandler {
     } catch (error) {
       vscode.window.showErrorMessage(`Error parsing Visual NuGet settings: ${error}`);
     }
+  }
+
+  private openSettings(): void {
+    vscode.commands.executeCommand('workbench.action.openSettings', '@ext:fullstackspider.visual-nuget');
   }
 
   public dispose(): void {

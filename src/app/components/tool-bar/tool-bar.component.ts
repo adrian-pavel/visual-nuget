@@ -6,6 +6,7 @@ import { PackageSource } from 'src-common/models/package-source';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
 
 import { BaseComponent } from '../base-component';
+import { VscodeService } from 'src/app/services/vscode.service';
 
 @Component({
   selector: 'app-tool-bar',
@@ -17,7 +18,7 @@ export class ToolBarComponent extends BaseComponent implements OnInit {
 
   public searchForm: FormGroup | undefined;
 
-  constructor(private packageManager: PackageManagerService, private fb: FormBuilder) {
+  constructor(private packageManager: PackageManagerService, private fb: FormBuilder, private vscodeService: VscodeService) {
     super();
   }
 
@@ -31,6 +32,10 @@ export class ToolBarComponent extends BaseComponent implements OnInit {
     const source = this.getSourceValue();
 
     this.packageManager.queryForPackages(query, prerelease, source);
+  }
+
+  public openSettings(): void {
+    this.vscodeService.postMessage({ command: 'open-settings' });
   }
 
   private listenForSourcesChanges(): void {
