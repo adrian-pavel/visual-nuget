@@ -61,6 +61,8 @@
     margin-top: 1rem;
     .description-text {
       font-size: 0.9rem;
+      white-space: pre-wrap;
+      font-family: var(--vscode-font-family);
     }
   }
 
