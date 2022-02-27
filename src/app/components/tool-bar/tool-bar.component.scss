@@ -34,6 +34,11 @@
     align-items: stretch;
     .source-title {
       margin-right: 0.25rem;
+      align-self: center;
+      white-space: nowrap;
+    }
+    .button {
+      margin-left: 0.25rem;
     }
   }
 }

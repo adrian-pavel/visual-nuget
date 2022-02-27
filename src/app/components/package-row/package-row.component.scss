@@ -62,16 +62,17 @@
     overflow: hidden;
     height: 100%;
 
-    .description-row {
+    .package-details {
+      white-space: nowrap;
       .name {
         font-size: 1rem;
         font-weight: bold;
       }
       .author,
-      .downloads {
+      .downloads,
+      .verified-icon {
         font-size: 0.75rem;
         margin-left: 0.5rem;
-        white-space: nowrap;
       }
     }
   }

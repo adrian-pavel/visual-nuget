@@ -18,13 +18,8 @@ hr {
 
 .package-list {
   display: flex;
-  height: 100%;
   flex-direction: column;
-  overflow-y: scroll;
-
-  & > *:last-child {
-    margin-bottom: 50px;
-  }
+  padding: 0.5rem 0;
 }
 
 .no-packages {

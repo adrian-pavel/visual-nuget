@@ -14,14 +14,20 @@
     </fa-stack>
   </div>
   <div class="description-container">
-    <div class="description-row">
+    <div class="package-details">
       <span class="name">{{ package.id }}</span>
+      <span
+        *ngIf="package.verified"
+        class="verified-icon"
+        title="The ID prefix of this package has been reserved for the package owner on the current source."
+        ><fa-icon icon="circle-check"></fa-icon
+      ></span>
       <span *ngIf="package.authors" class="author">by {{ package.authors }}</span>
       <span *ngIf="package.totalDownloads" class="downloads"
         ><strong>{{ package.totalDownloads | shortNumber }}</strong> downloads</span
       >
     </div>
-    <div class="description-row">{{ package.description.length > 180 ? (package.description | slice: 0:177) + '...' : package.description }}</div>
+    <div>{{ package.description.length > 180 ? (package.description | slice: 0:177) + '...' : package.description }}</div>
   </div>
   <div class="versions">
     <span *ngIf="package.isOutdated">{{ package.installedVersion }}</span>

@@ -17,10 +17,24 @@ import { PackageDetailsDependenciesComponent } from './components/package-detail
 import { VersionRangePipe } from './pipes/version-range.pipe';
 import { PackageDetailsVulnerabilitiesComponent } from './components/package-details-vulnerabilities/package-details-vulnerabilities.component';
 import { SeverityPipe } from './pipes/severity.pipe';
+import { AngularSplitModule } from 'angular-split';
 
 @NgModule({
-  declarations: [AppComponent, NavBarComponent, ToolBarComponent, PackageRowComponent, PackageListComponent, PackageDetailsComponent, ShortNumberPipe, LoadingSpinnerComponent, PackageDetailsDependenciesComponent, VersionRangePipe, PackageDetailsVulnerabilitiesComponent, SeverityPipe],
-  imports: [BrowserModule, HttpClientModule, ReactiveFormsModule, FontAwesomeModule],
+  declarations: [
+    AppComponent,
+    NavBarComponent,
+    ToolBarComponent,
+    PackageRowComponent,
+    PackageListComponent,
+    PackageDetailsComponent,
+    ShortNumberPipe,
+    LoadingSpinnerComponent,
+    PackageDetailsDependenciesComponent,
+    VersionRangePipe,
+    PackageDetailsVulnerabilitiesComponent,
+    SeverityPipe,
+  ],
+  imports: [BrowserModule, HttpClientModule, ReactiveFormsModule, FontAwesomeModule, AngularSplitModule],
   providers: [],
   bootstrap: [AppComponent],
 })

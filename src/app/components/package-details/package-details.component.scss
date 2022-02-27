@@ -1,8 +1,5 @@
 .package-details {
-  padding: 0.5rem;
-  padding-left: 1rem;
-  height: 100%;
-  overflow-y: scroll;
+  padding: 0.5rem 0.5rem 1rem 1rem;
 
   .label {
     font-size: 0.75rem;
@@ -64,6 +61,8 @@
     margin-top: 1rem;
     .description-text {
       font-size: 0.9rem;
+      white-space: pre-wrap;
+      font-family: var(--vscode-font-family);
     }
   }
 
