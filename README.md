@@ -2,6 +2,8 @@
 
 A visual NuGet package manager. Search for, install and uninstall NuGet packages.
 
+**Unfortunately I just don't have enough time to actively develop visual-nuget anymore. Maybe in the future, but for now please do not expect updates from my side and take it as is. I am open to reviewing PR's.**
+
 ### **Need to have dotnet installed. The extension forwards the commands to the dotnet cli.**
 
 ### Known issues and missing features
