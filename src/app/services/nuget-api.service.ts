@@ -21,6 +21,7 @@ export class NuGetApiService {
   private readonly SEARCH_QUERY_SERVICE: string = 'SearchQueryService';
   private readonly REGISTRATIONS_BASE_URL: string = 'RegistrationsBaseUrl';
   private readonly AUTHORIZATION_HEADER: string = 'authorization';
+  private readonly CORS_ORIGIN_HEADER: string = 'Access-Control-Allow-Origin';
 
   private readonly searchQueryServiceEndpoints = [
     `${this.SEARCH_QUERY_SERVICE}/${this.VERSIONED}`,
@@ -299,6 +300,7 @@ export class NuGetApiService {
     let headers = new HttpHeaders();
     if (sourceAuthorizationHeader) {
       headers = headers.append(this.AUTHORIZATION_HEADER, sourceAuthorizationHeader);
+      headers = headers.append(this.CORS_ORIGIN_HEADER, "*");
     }
     return headers;
   }
