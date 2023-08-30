@@ -23,13 +23,8 @@ export default class ProjectFileLoader {
     if (!parsedXml.Project.ItemGroup) {
       return [];
     }
-    const packageReferenceGroup = parsedXml.Project.ItemGroup.find((itemGroup: any) => itemGroup.PackageReference !== undefined);
 
-    if (!packageReferenceGroup) {
-      return [];
-    }
-
-    const packageReferences = packageReferenceGroup.PackageReference as Array<any>;
+    const packageReferences = parsedXml.Project.ItemGroup.filter((itemGroup: any) => itemGroup.PackageReference !== undefined).flatMap((itemGroup: { PackageReference: Array<any> }) => itemGroup.PackageReference);
 
     const packages = packageReferences.map((packageReference: any) => {
       return {
