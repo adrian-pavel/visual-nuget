@@ -72,10 +72,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "visual-nuget:build:production"
+              "buildTarget": "visual-nuget:build:production"
             },
             "development": {
-              "browserTarget": "visual-nuget:build:development"
+              "buildTarget": "visual-nuget:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -83,7 +83,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "visual-nuget:build"
+            "buildTarget": "visual-nuget:build"
           }
         },
         "lint": {
