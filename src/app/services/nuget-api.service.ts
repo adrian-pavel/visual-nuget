@@ -262,7 +262,7 @@ export class NuGetApiService {
   private compareSemVers(v1: string, v2: string): 0 | 1 | -1 {
     try {
       // try comparing the versions directly
-      return rcompare(v1, v2, { includePrerelease: true, loose: true });
+      return rcompare(v1, v2, { loose: true });
     } catch {
       // some versions do not respect the semver format, so coerce them and then compare
       const cleanV1 = coerce(v1);
@@ -271,7 +271,7 @@ export class NuGetApiService {
       if (cleanV1 === null || cleanV2 === null) {
         return 0;
       }
-      return rcompare(cleanV1, cleanV2, { includePrerelease: true, loose: true });
+      return rcompare(cleanV1, cleanV2, { loose: true });
     }
   }
 
