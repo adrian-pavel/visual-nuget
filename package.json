@@ -111,10 +111,10 @@
     "@fortawesome/fontawesome-svg-core": "~6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "angular-split": "^17.2.0",
-    "rxjs": "~7.5.4",
+    "rxjs": "~7.8.1",
     "semver": "^7.3.5",
     "tslib": "^2.3.0",
-    "xml2js": "^0.4.23",
+    "xml2js": "^0.6.2",
     "zone.js": "~0.14.10"
   },
   "devDependencies": {
@@ -133,14 +133,14 @@
     "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^8.1.0",
     "@typescript-eslint/parser": "^8.1.0",
-    "eslint": "^8.57.0",
+    "eslint": "^9.9.0",
     "jest": "^29.7.0",
-    "jest-preset-angular": "^11.1.1",
-    "npm-watch": "^0.11.0",
-    "ts-loader": "^9.2.6",
-    "typescript": "~5.4.5",
+    "jest-preset-angular": "^14.2.2",
+    "npm-watch": "^0.13.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "~5.5.4",
     "webpack": "^5.69.1",
-    "webpack-cli": "^4.9.2"
+    "webpack-cli": "^5.1.4"
   },
   "jest": {
     "preset": "jest-preset-angular",
