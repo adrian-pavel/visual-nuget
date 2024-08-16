@@ -9,7 +9,7 @@ import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontaweso
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { PackageListComponent } from './components/package-list/package-list.component';
 import { PackageDetailsComponent } from './components/package-details/package-details.component';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
@@ -34,9 +34,9 @@ import { AngularSplitModule } from 'angular-split';
     PackageDetailsVulnerabilitiesComponent,
     SeverityPipe,
   ],
-  imports: [BrowserModule, HttpClientModule, ReactiveFormsModule, FontAwesomeModule, AngularSplitModule],
-  providers: [],
   bootstrap: [AppComponent],
+  imports: [BrowserModule, ReactiveFormsModule, FontAwesomeModule, AngularSplitModule],
+  providers: [provideHttpClient(withInterceptorsFromDi())],
 })
 export class AppModule {
   constructor(library: FaIconLibrary) {
