@@ -46,6 +46,10 @@ Use this string when defining the source in the Settings.
 
 ## Release notes
 
+### v0.3.1
+
+- fix a bug related to multiple ItemGroup tags in the same csproj file not being read properly
+
 ### v0.3.0
 
 - no functional changes
