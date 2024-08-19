@@ -46,6 +46,11 @@ Use this string when defining the source in the Settings.
 
 ## Release notes
 
+### v0.3.0
+
+- no functional changes
+- updated Angular and dependencies
+
 ### v0.2.1
 
 - added verified icon to verified packages
