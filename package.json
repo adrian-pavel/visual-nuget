@@ -2,7 +2,7 @@
   "name": "visual-nuget",
   "displayName": "Visual NuGet",
   "description": "A visual NuGet package manager. Search for, install and uninstall NuGet packages.",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "icon": "images/logo.png",
   "publisher": "fullstackspider",
   "author": {
