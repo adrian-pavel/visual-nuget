@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { PackageRowModel } from 'src/app/models/package-row-model';
 import { CatalogEntry } from 'src/app/models/package-meta';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
@@ -14,7 +14,7 @@ import { BaseComponent } from '../base-component';
 export class PackageDetailsComponent extends BaseComponent implements OnInit {
   public package: PackageRowModel | null = null;
 
-  public selectedVersion: FormControl = new FormControl();
+  public selectedVersion: UntypedFormControl = new UntypedFormControl();
 
   public get selectedVersionObject(): CatalogEntry {
     return this.selectedVersion.value as CatalogEntry;

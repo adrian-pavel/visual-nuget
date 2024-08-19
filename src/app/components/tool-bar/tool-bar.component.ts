@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import { NUGET_ORG } from 'src/app/models/constants';
 import { PackageSource } from 'src-common/models/package-source';
@@ -16,9 +16,9 @@ import { VscodeService } from 'src/app/services/vscode.service';
 export class ToolBarComponent extends BaseComponent implements OnInit {
   public packageSources: PackageSource[] = [];
 
-  public searchForm: FormGroup | undefined;
+  public searchForm: UntypedFormGroup | undefined;
 
-  constructor(private packageManager: PackageManagerService, private fb: FormBuilder, private vscodeService: VscodeService) {
+  constructor(private packageManager: PackageManagerService, private fb: UntypedFormBuilder, private vscodeService: VscodeService) {
     super();
   }
 
