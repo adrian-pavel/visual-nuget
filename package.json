@@ -103,6 +103,7 @@
     "vscode:prepublish": "npm run package-all",
     "lint": "ng lint",
     "test": "jest",
+    "test-coverage": "jest --coverage",
     "test:watch": "jest --watch"
   },
   "private": true,
