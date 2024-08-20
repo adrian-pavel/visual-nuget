@@ -2,7 +2,7 @@
 import * as fs from 'fs';
 import * as xml2js from 'xml2js';
 import * as path from 'path';
-import { InstalledPackage, Project } from '../src-common/models/project';
+import { InstalledPackage, Project } from '../../src-common/models/project';
 
 export default class ProjectFileLoader {
   public async loadProjectAsync(projectFilePath: string): Promise<Project> {

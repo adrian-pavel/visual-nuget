@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import * as quickPickService from './services/quick-pick-service';
+import * as quickPick from './services/quick-pick';
 
 import UiPanel from './ui-panel';
 
@@ -9,7 +9,7 @@ export function activate(context: vscode.ExtensionContext) {
       UiPanel.createOrShow(context.extensionPath, uri);
     }),
     vscode.commands.registerCommand('visualnuget.managePackagesPalette', async (uri: vscode.Uri) => {
-      const projectFileUri = await quickPickService.pickProjectFile();
+      const projectFileUri = await quickPick.pickProjectFile();
       if (projectFileUri) {
         UiPanel.createOrShow(context.extensionPath, projectFileUri);
       }
