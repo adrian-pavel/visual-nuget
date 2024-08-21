@@ -1,0 +1,57 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - run: npm install
+
+      - run: xvfb-run -a npm test
+        if: runner.os == 'Linux'
+
+      - run: npm test
+        if: runner.os != 'Linux'
+
+      - name: Extract version from package.json
+        id: get_version
+        run: echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
+
+      - name: Package
+        run: npm run package
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          release_name: 'Release v${{ env.VERSION }}'
+          body: 'Automatic release for VSCode extension.'
+          draft: false
+          prerelease: false
+
+      - name: Upload VSIX to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./FullStackSpider.visual-nuget-${{ env.VERSION }}.vsix
+          asset_name: FullStackSpider.visual-nuget-${{ env.VERSION }}.vsix
+          asset_content_type: application/vsix
+
+      - name: Publish to marketplace
+        run: npm run publish
+        env:
+          VSCE_PAT: ${{ secrets.MARKETPLACE_PUBLISH_TOKEN }}
