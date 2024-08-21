@@ -47,8 +47,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./FullStackSpider.visual-nuget-${{ env.VERSION }}.vsix
-          asset_name: FullStackSpider.visual-nuget-${{ env.VERSION }}.vsix
+          asset_path: ./visual-nuget-${{ env.VERSION }}.vsix
+          asset_name: visual-nuget-${{ env.VERSION }}.vsix
           asset_content_type: application/vsix
 
       - name: Publish to marketplace
