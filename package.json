@@ -33,26 +33,34 @@
   "license": "SEE LICENSE IN LICENSE",
   "preview": true,
   "activationEvents": [
-    "onCommand:visualnuget.managepackages"
+    "onCommand:visualnuget.managePackages",
+    "onCommand:visualnuget.managePackagesPalette"
   ],
   "contributes": {
     "commands": [
       {
-        "command": "visualnuget.managepackages",
+        "command": "visualnuget.managePackages",
+        "title": "Visual NuGet: Manage Packages"
+      },
+      {
+        "command": "visualnuget.managePackagesPalette",
         "title": "Visual NuGet: Manage Packages"
       }
     ],
     "menus": {
       "commandPalette": [
         {
-          "command": "visualnuget.managepackages",
+          "command": "visualnuget.managePackages",
           "when": "false"
+        },
+        {
+          "command": "visualnuget.managePackagesPalette"
         }
       ],
       "explorer/context": [
         {
           "when": "resourceExtname == .csproj || resourceExtname == .vbproj || resourceExtname == .fsproj",
-          "command": "visualnuget.managepackages",
+          "command": "visualnuget.managePackages",
           "group": "navigation"
         }
       ]
@@ -95,6 +103,7 @@
     "vscode:prepublish": "npm run package-all",
     "lint": "ng lint",
     "test": "jest",
+    "test-coverage": "jest --coverage",
     "test:watch": "jest --watch"
   },
   "private": true,

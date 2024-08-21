@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import WebviewMessageHandler from './webview-message-handler';
+import WebviewMessageHandler from './services/webview-message-handler';
 
 export default class UiPanel {
   public static currentPanels: Record<string, UiPanel | undefined> = {};

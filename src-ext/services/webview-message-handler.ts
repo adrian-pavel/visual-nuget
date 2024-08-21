@@ -1,6 +1,6 @@
-import { ExtensionMessage } from '../src-common/models/extension-message';
-import { PackageSource } from '../src-common/models/package-source';
-import { InstallMessage, UIMessage, UninstallMessage } from '../src-common/models/ui-message';
+import { ExtensionMessage } from '../../src-common/models/extension-message';
+import { PackageSource } from '../../src-common/models/package-source';
+import { InstallMessage, UIMessage, UninstallMessage } from '../../src-common/models/ui-message';
 import * as vscode from 'vscode';
 
 import ProjectFileLoader from './project-file-loader';
