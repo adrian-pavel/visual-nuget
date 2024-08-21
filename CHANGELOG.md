@@ -1,5 +1,9 @@
 # Visual Nuget
 
+### v0.3.2
+
+- added command palette support (Ctrl-Shift-P)
+
 ### v0.3.1
 
 - fix a bug related to multiple ItemGroup tags in the same csproj file not being read properly
