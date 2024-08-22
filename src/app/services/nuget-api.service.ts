@@ -1,13 +1,14 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
-import { coerce, prerelease, rcompare } from 'semver';
+import { prerelease } from 'semver';
 
-import { ApiIndexResponse, ApiResource } from '../models/api-index-response';
-import { PackageRowModel } from '../models/package-row-model';
-import { CatalogEntry, PackageMetaResponse, RegistrationLeaf, RegistrationPage } from '../models/package-meta';
 import { PackageSource } from '../../../src-common/models/package-source';
+import { ApiIndexResponse, ApiResource } from '../models/api-index-response';
+import { CatalogEntry, PackageMetaResponse, RegistrationLeaf, RegistrationPage } from '../models/package-meta';
+import { PackageRowModel } from '../models/package-row-model';
 import { PackageSearchResult, SearchResults } from '../models/search-results';
+import { VersionService } from './version.service';
 
 @Injectable({
   providedIn: 'root',
@@ -33,7 +34,7 @@ export class NuGetApiService {
     this.REGISTRATIONS_BASE_URL,
   ];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private versionService: VersionService) {}
 
   public search(query: string, prerelease: boolean, source: PackageSource): Observable<PackageRowModel[]> {
     const requestHeaders = this.composeRequestHeaders(source.authorizationHeader);
@@ -168,7 +169,7 @@ export class NuGetApiService {
     const allCatalogEntries = filteredRegistrationLeafs.map((registrationLeaf: RegistrationLeaf): CatalogEntry => registrationLeaf.catalogEntry);
 
     allCatalogEntries.sort((entry1: CatalogEntry, entry2: CatalogEntry): number => {
-      return this.compareSemVers(entry1.version, entry2.version);
+      return this.versionService.compareSemVers(entry1.version, entry2.version);
     });
 
     return allCatalogEntries;
@@ -257,22 +258,6 @@ export class NuGetApiService {
           return endpointToUse;
         })
       );
-  }
-
-  private compareSemVers(v1: string, v2: string): 0 | 1 | -1 {
-    try {
-      // try comparing the versions directly
-      return rcompare(v1, v2, { loose: true });
-    } catch {
-      // some versions do not respect the semver format, so coerce them and then compare
-      const cleanV1 = coerce(v1);
-      const cleanV2 = coerce(v2);
-      // if was not able to extract a version just consider them equal as a fallback
-      if (cleanV1 === null || cleanV2 === null) {
-        return 0;
-      }
-      return rcompare(cleanV1, cleanV2, { loose: true });
-    }
   }
 
   private mapSearchResultsToPackageRows(
