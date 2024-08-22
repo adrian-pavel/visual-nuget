@@ -1,5 +1,9 @@
 # Visual Nuget
 
+### v0.3.3
+
+- added support for versions with Revision to be sorted properly: 1.2.3.45
+
 ### v0.3.2
 
 - added command palette support (Ctrl-Shift-P)
