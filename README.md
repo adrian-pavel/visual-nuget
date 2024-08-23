@@ -1,6 +1,6 @@
 # Visual Nuget
 
-A visual NuGet package manager. Search for, install and uninstall NuGet packages.
+A visual NuGet package manager. Search for, install and uninstall NuGet packages. (.Net Framework not supported)
 
 **Unfortunately I just don't have enough time to actively develop visual-nuget anymore. Maybe in the future, but for now please do not expect updates from my side and take it as is.**
 
