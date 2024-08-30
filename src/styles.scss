@@ -37,6 +37,16 @@ body {
   font-weight: var(--vscode-font-weight);
   font-size: var(--vscode-font-size);
   padding: 0.25rem;
+
+  &:focus {
+    outline-color: var(--vscode-focusBorder);
+  }
+}
+
+input {
+  &:focus {
+    outline-color: var(--vscode-focusBorder);
+  }
 }
 
 .ellipsis {
