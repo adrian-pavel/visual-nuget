@@ -1,5 +1,9 @@
 # Visual Nuget
 
+### v0.3.4
+
+- fixed issue where input outline color did not match the vscode theme
+
 ### v0.3.3
 
 - added support for versions with Revision to be sorted properly: 1.2.3.45
