@@ -176,7 +176,7 @@ export class NuGetApiService {
   }
 
   private convertCatalogEntriesToPackageRow(catalogEntries: CatalogEntry[] | null, packageId: string, sourceUrl: string): PackageRowModel | null {
-    if (catalogEntries === null) {
+    if (catalogEntries === null || catalogEntries.length === 0) {
       return null;
     }
 
