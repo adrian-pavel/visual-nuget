@@ -1,59 +1,192 @@
-<div *ngIf="package" class="package-details">
-  <div class="header">
-    <div class="icon">
-      <img *ngIf="package.iconUrl" [src]="package.iconUrl" />
-      <fa-icon class="placeholder-icon" *ngIf="!package.iconUrl" icon="cubes"></fa-icon>
+@if (isLoading) {
+  <app-loading-spinner></app-loading-spinner>
+} @else if (loadError) {
+  <div class="package-load-error" role="alert">{{ loadError }}</div>
+} @else if (package) {
+  <div class="package-details">
+    <div class="header">
+      <div class="icon">
+        @if (package.iconUrl) {
+          <img [src]="package.iconUrl" />
+        }
+        @if (!package.iconUrl) {
+          <fa-icon class="placeholder-icon" icon="cubes"></fa-icon>
+        }
+      </div>
+      <div class="name">{{ package.id }}</div>
     </div>
-    <div class="name">{{ package.id }}</div>
-  </div>
-  <div *ngIf="package.isInstalled" class="version-container">
-    <span class="label">Installed:</span>
-    <span class="drop-down installed-version-display">{{ package.installedVersion }}</span>
-    <button class="button" (click)="uninstall()">Uninstall</button>
-  </div>
-  <div class="version-container">
-    <span class="label">Version:</span>
-    <select class="drop-down" [formControl]="selectedVersion">
-      <option *ngFor="let version of package.versions" [ngValue]="version">{{ version.version }}</option>
-    </select>
-    <button class="button" (click)="install()">{{ package.isInstalled ? 'Update' : 'Install' }}</button>
-  </div>
-  <ng-container *ngIf="selectedVersionObject">
-    <app-package-details-vulnerabilities [vulnerabilities]="selectedVersionObject.vulnerabilities"></app-package-details-vulnerabilities>
-    <div class="description">
-      <p class="label">Description</p>
-      <pre class="description-text">{{ selectedVersionObject.description }}</pre>
+    @if (package.isInstalled) {
+      <div class="version-container">
+        <span class="label">Installed:</span>
+        <span class="drop-down installed-version-display">{{ package.installedVersion }}</span>
+        @if (!isSolution || hasDirectInstalledPackage) {
+          <button
+            class="button"
+            (click)="uninstall()"
+            [disabled]="isPackageOperationInProgress || (isSolution && !hasSelectedDirectPackage)"
+          >
+            Uninstall
+          </button>
+        }
+      </div>
+    }
+    @if (isSolution && package.solutionProjectStates) {
+      <section class="solution-package-breakdown" aria-label="Package projects">
+        <div class="project-table-container">
+          <table class="project-table">
+            <thead>
+              <tr>
+                <th>
+                  <input
+                    type="checkbox"
+                    aria-label="Select all projects for this package"
+                    [checked]="allProjectsSelected"
+                    [disabled]="isPackageOperationInProgress"
+                    (change)="toggleAllProjects($any($event.target).checked)"
+                  />
+                </th>
+                <th>Project</th>
+                <th>Installed</th>
+                <th>Package level</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (projectState of package.solutionProjectStates; track trackProject(projectState.projectPath)) {
+                <tr>
+                  <td>
+                    <input
+                      type="checkbox"
+                      [attr.aria-label]="'Select ' + projectState.projectName"
+                      [checked]="selectedProjectPaths.includes(projectState.projectPath)"
+                      [disabled]="isPackageOperationInProgress"
+                      (change)="toggleProject(projectState.projectPath, $any($event.target).checked)"
+                    />
+                  </td>
+                  <td [title]="projectState.projectPath">{{ projectState.projectName }}</td>
+                  <td>
+                    @if (projectState.isInstalled) {
+                      {{ projectState.installedVersion }}
+                    } @else {
+                      <span class="not-installed">Not installed</span>
+                    }
+                  </td>
+                  <td>
+                    {{
+                      projectState.packageLevel === 'direct'
+                        ? 'Direct'
+                        : projectState.packageLevel === 'transitive'
+                          ? 'Transitive'
+                          : projectState.packageLevel === 'mixed'
+                            ? 'Mixed'
+                            : projectState.isInstalled
+                              ? 'Unknown'
+                              : '—'
+                    }}
+                  </td>
+                </tr>
+                @if (projectState.targetFrameworkVersions && projectState.targetFrameworkVersions.length > 1) {
+                  <tr class="framework-version">
+                    <td></td>
+                    <td colspan="3">
+                      @for (frameworkVersion of projectState.targetFrameworkVersions; track frameworkVersion.targetFramework) {
+                        <span>{{ frameworkVersion.targetFramework }}: {{ frameworkVersion.version }}</span>
+                      }
+                    </td>
+                  </tr>
+                }
+                @if (projectState.packageListWarning) {
+                  <tr class="package-warning">
+                    <td></td>
+                    <td colspan="3">{{ projectState.packageListWarning }}</td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (hasSelectedCentralVersion) {
+          <p class="central-version-note">
+            Updating a centrally managed version can also affect other projects that use the same central entry.
+          </p>
+        }
+        @if (hasCpmExceptions) {
+          <label class="exception-option">
+            <input
+              type="checkbox"
+              [checked]="includeCpmExceptions"
+              [disabled]="isPackageOperationInProgress"
+              (change)="includeCpmExceptions = $any($event.target).checked"
+            />
+            Also update package overrides and framework-specific versions
+          </label>
+        }
+      </section>
+    }
+    <div class="version-container">
+      <span class="label">Version:</span>
+      <select class="drop-down" [formControl]="selectedVersion" [disabled]="isPackageOperationInProgress">
+        @for (version of package.versions; track version) {
+          <option [ngValue]="version">{{ versionOptionLabel(version) }}</option>
+        }
+      </select>
+      <button
+        class="button"
+        (click)="install()"
+        [disabled]="isPackageOperationInProgress || (isSolution && selectedProjectPaths.length === 0)"
+      >
+        {{ isSolution ? installButtonLabel : (package.isInstalled ? 'Update' : 'Install') }}
+      </button>
     </div>
-    <div class="details">
-      <div class="details-row">
-        <span class="label">Version:</span>
-        <span class="content">{{ selectedVersionObject.version }}</span>
+    @if (selectedVersionObject) {
+      <app-package-details-vulnerabilities
+        [vulnerabilities]="selectedVersionVulnerabilities"
+        [deprecation]="selectedVersionDeprecation"
+      ></app-package-details-vulnerabilities>
+      <div class="description">
+        <p class="label">Description</p>
+        <pre class="description-text">{{ selectedVersionObject.description }}</pre>
       </div>
-      <div *ngIf="selectedVersionObject.authors" class="details-row">
-        <span class="label">Author(s):</span>
-        <span class="content">{{ selectedVersionObject.authors }}</span>
+      <div class="details">
+        <div class="details-row">
+          <span class="label">Version:</span>
+          <span class="content">{{ selectedVersionObject.version }}</span>
+        </div>
+        @if (selectedVersionObject.authors) {
+          <div class="details-row">
+            <span class="label">Author(s):</span>
+            <span class="content">{{ selectedVersionObject.authors }}</span>
+          </div>
+        }
+        @if (selectedVersionObject.licenseUrl) {
+          <div class="details-row">
+            <span class="label">License:</span>
+            <span class="content"
+              ><a [href]="selectedVersionObject.licenseUrl">{{ selectedVersionObject.licenseUrl }}</a></span
+              >
+            </div>
+          }
+          @if (selectedVersionObject.published) {
+            <div class="details-row">
+              <span class="label">Date published:</span>
+              <span class="content">{{ selectedVersionObject.published | date }}</span>
+            </div>
+          }
+          @if (selectedVersionObject.projectUrl) {
+            <div class="details-row">
+              <span class="label">Project url:</span>
+              <span class="content"
+                ><a [href]="selectedVersionObject.projectUrl">{{ selectedVersionObject.projectUrl }}</a></span
+                >
+              </div>
+            }
+            @if (selectedVersionObject.tags) {
+              <div class="details-row">
+                <span class="label">Tags:</span>
+                <span class="content">{{ selectedVersionObject.tags }}</span>
+              </div>
+            }
+            <app-package-details-dependencies [dependencyGroups]="selectedVersionObject.dependencyGroups"></app-package-details-dependencies>
+          </div>
+        }
       </div>
-      <div *ngIf="selectedVersionObject.licenseUrl" class="details-row">
-        <span class="label">License:</span>
-        <span class="content"
-          ><a [href]="selectedVersionObject.licenseUrl">{{ selectedVersionObject.licenseUrl }}</a></span
-        >
-      </div>
-      <div *ngIf="selectedVersionObject.published" class="details-row">
-        <span class="label">Date published:</span>
-        <span class="content">{{ selectedVersionObject.published | date }}</span>
-      </div>
-      <div *ngIf="selectedVersionObject.projectUrl" class="details-row">
-        <span class="label">Project url:</span>
-        <span class="content"
-          ><a [href]="selectedVersionObject.projectUrl">{{ selectedVersionObject.projectUrl }}</a></span
-        >
-      </div>
-      <div *ngIf="selectedVersionObject.tags" class="details-row">
-        <span class="label">Tags:</span>
-        <span class="content">{{ selectedVersionObject.tags }}</span>
-      </div>
-      <app-package-details-dependencies [dependencyGroups]="selectedVersionObject.dependencyGroups"></app-package-details-dependencies>
-    </div>
-  </ng-container>
-</div>
+    }

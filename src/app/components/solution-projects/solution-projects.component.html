@@ -1,0 +1,14 @@
+@if (hasStatus) {
+  <section class="solution-projects" aria-label="Package operation status">
+    @if (unsupportedProjects.length > 0) {
+      <div class="notice">{{ unsupportedProjects.length }} unsupported project(s) skipped.</div>
+    }
+    @if (loadFailures.length > 0) {
+      <div class="notice error">
+        @for (failure of loadFailures; track failure.projectPath) {
+          <div>{{ failure.projectPath }}: {{ failure.message }}</div>
+        }
+      </div>
+    }
+  </section>
+}

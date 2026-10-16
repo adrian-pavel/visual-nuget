@@ -2,21 +2,57 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  $header-height: 103px;
 
   .header {
     flex-shrink: 0;
-    height: $header-height;
     min-width: 525px;
   }
   .main-section {
     display: flex;
     flex: 1;
-    height: calc(100% - $header-height);
+    min-height: 0;
 
     & > * {
       flex: 1;
       min-width: 200px;
+    }
+  }
+
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+
+    &--blocking {
+      pointer-events: auto;
+    }
+
+    &__panel {
+      display: flex;
+      min-width: 240px;
+      max-width: min(80vw, 560px);
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1.25rem 1.5rem;
+      color: var(--vscode-foreground);
+      background: var(--vscode-editor-background);
+      border: 1px solid var(--vscode-widget-border);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+      text-align: center;
+
+      app-loading-spinner {
+        width: 80px;
+        height: 80px;
+      }
+
+      progress {
+        width: 100%;
+      }
     }
   }
 }

@@ -1,47 +1,90 @@
-<div *ngIf="package" class="package-row" [ngClass]="{ active: isActive }" (click)="click()">
-  <input *ngIf="showSelectionCheckbox" class="select-checkbox" type="checkbox" [checked]="isSelected" (click)="select($event)" />
-  <div class="icon">
-    <img *ngIf="package.iconUrl" [src]="package.iconUrl" (error)="package.iconUrl = ''" />
-    <fa-icon class="placeholder-icon" *ngIf="!package.iconUrl" icon="cubes"></fa-icon>
-    <fa-stack *ngIf="package.isInstalled" class="status-icon" size="1x">
-      <fa-icon icon="circle" stackItemSize="1x"></fa-icon>
-      <fa-icon
-        class="actual-icon"
-        [ngClass]="{ outdated: package.isOutdated }"
-        [icon]="package.isOutdated ? 'circle-up' : 'circle-check'"
-        stackItemSize="1x"
-      ></fa-icon>
-    </fa-stack>
-  </div>
-  <div class="description-container">
-    <div class="package-details">
-      <span class="name">{{ package.id }}</span>
-      <span
-        *ngIf="package.verified"
-        class="verified-icon"
-        title="The ID prefix of this package has been reserved for the package owner on the current source."
-        ><fa-icon icon="circle-check"></fa-icon
-      ></span>
-      <span *ngIf="package.authors" class="author">by {{ package.authors }}</span>
-      <span *ngIf="package.totalDownloads" class="downloads"
-        ><strong>{{ package.totalDownloads | shortNumber }}</strong> downloads</span
-      >
+@if (package) {
+  <div class="package-row" [ngClass]="{ active: isActive }" (click)="click()">
+    @if (showSelectionCheckbox) {
+      <input class="select-checkbox" type="checkbox" [checked]="isSelected" (click)="select($event)" />
+    }
+    <div class="icon">
+      @if (package.iconUrl) {
+        <img [src]="package.iconUrl" (error)="package.iconUrl = ''" />
+      }
+      @if (!package.iconUrl) {
+        <fa-icon class="placeholder-icon" icon="cubes"></fa-icon>
+      }
+      @if (package.isInstalled) {
+        <fa-stack class="status-icon" size="1x">
+          <fa-icon icon="circle" stackItemSize="1x"></fa-icon>
+          <fa-icon
+            class="actual-icon"
+            [ngClass]="{ outdated: package.isOutdated }"
+            [icon]="package.isOutdated ? 'circle-up' : 'circle-check'"
+            stackItemSize="1x"
+          ></fa-icon>
+        </fa-stack>
+      }
     </div>
-    <div>{{ package.description.length > 180 ? (package.description | slice: 0:177) + '...' : package.description }}</div>
+    <div class="description-container">
+      <div class="package-details">
+        <span class="name">{{ package.id }}</span>
+        @if (package.verified) {
+          <span
+            class="verified-icon"
+            title="The ID prefix of this package has been reserved for the package owner on the current source."
+            ><fa-icon icon="circle-check"></fa-icon
+          ></span>
+        }
+        @if (package.vulnerabilities?.length) {
+          <span
+            class="package-warning-icon vulnerability-warning"
+            role="img"
+            [attr.aria-label]="'Known vulnerabilities in version ' + package.version"
+            [title]="'Known vulnerabilities in version ' + package.version"
+            ><fa-icon icon="triangle-exclamation" aria-hidden="true"></fa-icon
+          ></span>
+        }
+        @if (package.deprecation) {
+          <span
+            class="package-warning-icon deprecation-warning"
+            role="img"
+            [attr.aria-label]="'Version ' + package.version + ' is deprecated'"
+            [title]="'Version ' + package.version + ' is deprecated'"
+            ><fa-icon icon="triangle-exclamation" aria-hidden="true"></fa-icon
+          ></span>
+        }
+        @if (package.authors) {
+          <span class="author">by {{ package.authors }}</span>
+        }
+        @if (package.totalDownloads) {
+          <span class="downloads"><strong>{{ package.totalDownloads | shortNumber }}</strong> downloads</span>
+        }
+      </div>
+      <div>
+        {{ package.description.length > 180 ? (package.description | slice: 0:177) + '...' : package.description }}
+      </div>
+    </div>
+    <div class="versions">
+      @if (package.isOutdated) {
+        <span>{{ package.installedVersion }}</span>
+      }
+      <span>{{ package.version }}</span>
+    </div>
+    @if (!isSolution) {
+      <div class="actions">
+        @if (!package.isInstalled) {
+          <button class="button secondary" (click)="install($event)" [disabled]="isPackageOperationInProgress">
+            <fa-icon icon="arrow-down"></fa-icon>
+          </button>
+        }
+        @if (package.isInstalled) {
+          <button class="button secondary" (click)="uninstall($event)" [disabled]="isPackageOperationInProgress">
+            <fa-icon icon="xmark"></fa-icon>
+          </button>
+        }
+        @if (package.isOutdated) {
+          <button class="button secondary" (click)="update($event)" [disabled]="isPackageOperationInProgress">
+            <fa-icon icon="arrow-up"></fa-icon>
+          </button>
+        }
+      </div>
+    }
   </div>
-  <div class="versions">
-    <span *ngIf="package.isOutdated">{{ package.installedVersion }}</span>
-    <span>{{ package.version }}</span>
-  </div>
-  <div class="actions">
-    <button *ngIf="!package.isInstalled" class="button secondary" (click)="install($event)">
-      <fa-icon icon="arrow-down"></fa-icon>
-    </button>
-    <button *ngIf="package.isInstalled" class="button secondary" (click)="uninstall($event)">
-      <fa-icon icon="xmark"></fa-icon>
-    </button>
-    <button *ngIf="package.isOutdated" class="button secondary" (click)="update($event)">
-      <fa-icon icon="arrow-up"></fa-icon>
-    </button>
-  </div>
-</div>
+}

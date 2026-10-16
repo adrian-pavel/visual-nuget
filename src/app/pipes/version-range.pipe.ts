@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'versionRange',
+    name: 'versionRange',
+    standalone: false
 })
 export class VersionRangePipe implements PipeTransform {
   transform(value: string): string {

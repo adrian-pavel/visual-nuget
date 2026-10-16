@@ -1,7 +1,11 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-@Component({ template: '' })
+@Component({
+    template: '',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
+})
 export class BaseComponent implements OnDestroy {
   protected subscriptions: Subscription = new Subscription();
 

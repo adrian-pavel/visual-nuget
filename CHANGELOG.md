@@ -1,5 +1,11 @@
 # Visual Nuget
 
+### v0.5.1
+
+- Added solution-wide package management and Central Package Management support.
+- Improved package loading for large solutions with parallel inventory loading and session caching.
+- Added loading progress and clearer error reporting.
+
 ### v0.3.4
 
 - fixed issue where input outline color did not match the vscode theme

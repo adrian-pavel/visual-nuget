@@ -1,11 +1,13 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { PackageRowModel } from 'src/app/models/package-row-model';
 import { PackageManagerService } from 'src/app/services/package-manager.service';
 
 @Component({
-  selector: 'app-package-row',
-  templateUrl: './package-row.component.html',
-  styleUrls: ['./package-row.component.scss'],
+    selector: 'app-package-row',
+    templateUrl: './package-row.component.html',
+    styleUrls: ['./package-row.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class PackageRowComponent {
   @Input()
@@ -13,6 +15,9 @@ export class PackageRowComponent {
 
   @Input()
   public package: PackageRowModel | null = null;
+
+  @Input()
+  public isSolution = false;
 
   @Input()
   public showSelectionCheckbox = false;
@@ -24,6 +29,10 @@ export class PackageRowComponent {
   public changeSelect = new EventEmitter<boolean>();
 
   constructor(private packageManager: PackageManagerService) {}
+
+  public get isPackageOperationInProgress(): boolean {
+    return this.packageManager.isPackageOperationInProgress;
+  }
 
   public select(event: MouseEvent): void {
     event.stopPropagation();

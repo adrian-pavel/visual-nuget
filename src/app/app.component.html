@@ -1,9 +1,10 @@
 <div class="layout">
-  <section class="header">
+  <section class="header" [attr.inert]="isContextLoading ? '' : null">
     <app-nav-bar></app-nav-bar>
+    <app-solution-projects></app-solution-projects>
     <app-tool-bar></app-tool-bar>
   </section>
-  <section class="main-section">
+  <section class="main-section" [attr.inert]="isContextLoading ? '' : null">
     <as-split direction="horizontal" [gutterSize]="5">
       <as-split-area [size]="60" [minSize]="20">
         <app-package-list></app-package-list>
@@ -13,4 +14,21 @@
       </as-split-area>
     </as-split>
   </section>
+  @if (showLoadingOverlay) {
+    <div
+      class="loading-overlay"
+      [class.loading-overlay--blocking]="isContextLoading"
+      role="status"
+      aria-live="polite"
+    >
+      <section class="loading-overlay__panel">
+        <app-loading-spinner></app-loading-spinner>
+        <span>{{ loadingMessage }}</span>
+        @if (contextLoading && contextLoading.total !== undefined && contextLoading.total > 0) {
+          <progress [value]="contextLoading.completed ?? 0" [max]="contextLoading.total"></progress>
+        }
+      </section>
+    </div>
+  }
 </div>
+<app-package-operation-dialog [attr.inert]="isContextLoading ? '' : null"></app-package-operation-dialog>

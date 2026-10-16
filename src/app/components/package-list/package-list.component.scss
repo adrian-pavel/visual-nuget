@@ -20,6 +20,11 @@ hr {
   display: flex;
   flex-direction: column;
   padding: 0.5rem 0;
+
+  summary {
+    cursor: pointer;
+    padding: 0.5rem;
+  }
 }
 
 .no-packages {

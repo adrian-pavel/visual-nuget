@@ -57,6 +57,36 @@
     }
   }
 
+  .solution-package-breakdown {
+    margin-bottom: 0.75rem;
+  }
+
+  .project-table-container {
+    max-height: 12rem;
+    overflow: auto;
+    border: 1px solid var(--vscode-panel-border);
+  }
+
+  .project-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+
+    th, td {
+      padding: 0.2rem 0.35rem;
+      border-bottom: 1px solid var(--vscode-panel-border);
+      text-align: left;
+    }
+  }
+
+  .not-installed, .framework-version, .central-version-note {
+    color: var(--vscode-descriptionForeground);
+  }
+
+  .package-warning {
+    color: var(--vscode-editorWarning-foreground);
+  }
+
   .description {
     margin-top: 1rem;
     .description-text {

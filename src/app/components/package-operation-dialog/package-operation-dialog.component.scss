@@ -1,0 +1,245 @@
+:host {
+  --widget-border: var(--vscode-widget-border, var(--vscode-panel-border));
+}
+
+.operation-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 68%);
+  backdrop-filter: blur(2px);
+}
+
+.operation-dialog {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: min(620px, 100%);
+  max-height: min(82vh, 720px);
+  overflow: hidden;
+  color: var(--vscode-foreground);
+  background: var(--vscode-editorWidget-background, var(--vscode-editor-background));
+  border: 1px solid var(--widget-border);
+  border-radius: 8px;
+  box-shadow: 0 12px 40px var(--vscode-widget-shadow, rgb(0 0 0 / 40%));
+}
+
+.progress-dialog {
+  align-items: center;
+  width: min(440px, 100%);
+  padding: 2rem;
+  text-align: center;
+
+  app-loading-spinner {
+    display: block;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 0.75rem;
+  }
+
+  h2 {
+    margin: 0.25rem 0 0.5rem;
+    font-size: 1.15rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--vscode-descriptionForeground);
+  }
+}
+
+.dialog-header {
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--widget-border);
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  p {
+    margin: 0.4rem 0 0;
+    color: var(--vscode-descriptionForeground);
+  }
+
+  &.has-failures h2 {
+    color: var(--vscode-errorForeground);
+  }
+}
+
+.dialog-content {
+  min-height: 0;
+  overflow: auto;
+  padding: 1rem 1.5rem;
+}
+
+.operation-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.7rem;
+  background: var(--vscode-sideBar-background, var(--vscode-editor-background));
+  border: 1px solid var(--widget-border);
+  border-radius: 6px;
+
+  strong {
+    font-size: 1.25rem;
+  }
+
+  span {
+    color: var(--vscode-descriptionForeground);
+    font-size: 0.8rem;
+  }
+
+  &.succeeded strong {
+    color: var(--vscode-testing-iconPassed, var(--vscode-foreground));
+  }
+
+  &.failed strong {
+    color: var(--vscode-errorForeground);
+  }
+
+  &.skipped strong {
+    color: var(--vscode-editorWarning-foreground, var(--vscode-descriptionForeground));
+  }
+}
+
+.package-change-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.75rem;
+}
+
+.package-change-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--widget-border);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &.is-failure .change-message {
+    color: var(--vscode-errorForeground);
+  }
+}
+
+.package-change-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+
+  .version-transition {
+    font-family: var(--vscode-editor-font-family, var(--vscode-font-family));
+    overflow-wrap: anywhere;
+  }
+}
+
+.package-context {
+  color: var(--vscode-descriptionForeground);
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.change-message {
+  margin: 0.15rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.message-label {
+  font-size: 0.8rem;
+}
+
+.status-icon {
+  flex: 0 0 1.4rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+
+  &.is-success {
+    color: var(--vscode-testing-iconPassed, var(--vscode-foreground));
+  }
+
+  &.is-failure {
+    color: var(--vscode-errorForeground);
+  }
+
+  &.is-skipped {
+    color: var(--vscode-editorWarning-foreground, var(--vscode-descriptionForeground));
+  }
+}
+
+.failure-details {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--widget-border);
+
+  h3 {
+    margin: 0 0 0.5rem;
+    color: var(--vscode-errorForeground);
+    font-size: 0.95rem;
+  }
+}
+
+.operation-failure {
+  padding: 0.6rem 0;
+
+  strong {
+    overflow-wrap: anywhere;
+  }
+
+  p {
+    margin: 0.25rem 0 0;
+    color: var(--vscode-errorForeground);
+    overflow-wrap: anywhere;
+  }
+}
+
+.success-message {
+  margin: 1rem 0 0;
+  color: var(--vscode-descriptionForeground);
+}
+
+.background-auth-note {
+  margin: 0.75rem 0 0;
+  color: var(--vscode-descriptionForeground);
+  font-size: 0.85rem;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.85rem 1.5rem;
+  border-top: 1px solid var(--widget-border);
+
+  button {
+    min-height: 30px;
+    padding: 0.4rem 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog-content,
+  .dialog-header,
+  .dialog-actions {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+}

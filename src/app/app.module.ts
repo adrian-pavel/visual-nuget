@@ -9,7 +9,7 @@ import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontaweso
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { PackageListComponent } from './components/package-list/package-list.component';
 import { PackageDetailsComponent } from './components/package-details/package-details.component';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
@@ -18,6 +18,8 @@ import { VersionRangePipe } from './pipes/version-range.pipe';
 import { PackageDetailsVulnerabilitiesComponent } from './components/package-details-vulnerabilities/package-details-vulnerabilities.component';
 import { SeverityPipe } from './pipes/severity.pipe';
 import { AngularSplitModule } from 'angular-split';
+import { SolutionProjectsComponent } from './components/solution-projects/solution-projects.component';
+import { PackageOperationDialogComponent } from './components/package-operation-dialog/package-operation-dialog.component';
 
 @NgModule({
   declarations: [
@@ -33,10 +35,12 @@ import { AngularSplitModule } from 'angular-split';
     VersionRangePipe,
     PackageDetailsVulnerabilitiesComponent,
     SeverityPipe,
+    SolutionProjectsComponent,
+    PackageOperationDialogComponent,
   ],
   bootstrap: [AppComponent],
   imports: [BrowserModule, ReactiveFormsModule, FontAwesomeModule, AngularSplitModule],
-  providers: [provideHttpClient(withInterceptorsFromDi())],
+  providers: [provideHttpClient(withXhr(), withInterceptorsFromDi())],
 })
 export class AppModule {
   constructor(library: FaIconLibrary) {

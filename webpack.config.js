@@ -38,6 +38,7 @@ const config = {
           {
             loader: 'ts-loader',
             options: {
+              configFile: path.resolve(__dirname, 'tsconfig.ext.json'),
               compilerOptions: {
                 module: 'es6', // override `tsconfig.json` so that TypeScript emits native JavaScript modules.
               },

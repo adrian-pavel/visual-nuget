@@ -15,13 +15,34 @@
       [ngClass]="{ active: currentCategory === Category.Updates }"
       (click)="categoryChange(Category.Updates)"
     >
-      Updates
+      <span class="category-label">Updates</span>
+      @if (updateCountState.error) {
+        <span class="category-count error" [title]="'Could not load available updates: ' + updateCountState.error">!</span>
+      } @else if (updateCountState.loading) {
+        <span class="category-count" aria-label="Loading update count">…</span>
+      } @else if (updateCountState.count !== null) {
+        <span class="category-count" [attr.aria-label]="updateCountState.count + ' packages with updates'">
+          {{ updateCountState.count }}
+        </span>
+      }
     </button>
+    @if (isSolution && consolidationCount > 0) {
+      <button
+        class="navbar-item category-button"
+        [ngClass]="{ active: currentCategory === Category.Consolidate }"
+        (click)="categoryChange(Category.Consolidate)"
+      >
+        <span class="category-label">Consolidate</span>
+        <span class="category-count" [attr.aria-label]="consolidationCount + ' packages to consolidate'">
+          {{ consolidationCount }}
+        </span>
+      </button>
+    }
   </div>
 
   <div class="navbar-end" [title]="currentProjectFsPath">
     <div class="navbar-item">
-      <span class="project-name">Visual NuGet: {{ currentProjectName }}</span>
+      <span class="project-name">Visual NuGet{{ isSolution ? ' Solution' : '' }}: {{ currentProjectName }}</span>
     </div>
   </div>
 </nav>

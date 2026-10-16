@@ -68,6 +68,11 @@
         font-size: 1rem;
         font-weight: bold;
       }
+
+      .package-warning-icon {
+        margin-left: 0.35rem;
+        color: var(--vscode-editorWarning-foreground);
+      }
       .author,
       .downloads,
       .verified-icon {

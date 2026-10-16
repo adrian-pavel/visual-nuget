@@ -1,11 +1,38 @@
-<div *ngIf="vulnerabilities" class="vulnerabilities-container">
-  <div class="header">
-    <fa-icon class="warning-icon" icon="triangle-exclamation"></fa-icon>
-    <span class="label">Vulnerabilities detected ({{ vulnerabilities.length }})</span>
-  </div>
-  <div class="explanation">This package version has vulnerabilities. Read the advisories and decide if you should switch to another version.</div>
-  <div *ngFor="let vulnerability of vulnerabilities" class="vulnerability">
-    <span class="label">Advisory ({{ vulnerability.severity | severity }}):</span>
-    <a [href]="vulnerability.advisoryUrl">{{ vulnerability.advisoryUrl }}</a>
-  </div>
-</div>
+@if (vulnerabilities?.length) {
+  <section class="vulnerabilities-container" role="note" aria-label="Known package vulnerabilities">
+    <div class="header">
+      <fa-icon class="warning-icon" icon="triangle-exclamation"></fa-icon>
+      <span class="label">Vulnerabilities detected ({{ vulnerabilities.length }})</span>
+    </div>
+    <div class="explanation">This package version has vulnerabilities. Read the advisories and decide if you should switch to another version.</div>
+    @for (vulnerability of vulnerabilities; track vulnerability.advisoryUrl) {
+      <div class="vulnerability">
+        <span class="label">Advisory ({{ vulnerability.severity | severity }}):</span>
+        <a [href]="vulnerability.advisoryUrl" target="_blank" rel="noopener noreferrer">{{ vulnerability.advisoryUrl }}</a>
+      </div>
+    }
+  </section>
+}
+
+@if (deprecation) {
+  <section class="deprecation-container" role="note" aria-label="Package deprecation">
+    <div class="header">
+      <fa-icon class="warning-icon" icon="triangle-exclamation"></fa-icon>
+      <span class="label">This package version is deprecated</span>
+    </div>
+    @if (deprecation.message) {
+      <p class="deprecation-message">{{ deprecation.message }}</p>
+    }
+    @if (deprecation.reasons?.length) {
+      <p class="deprecation-reasons">Reason(s): {{ deprecation.reasons.join(', ') }}</p>
+    }
+    @if (deprecation.alternatePackage) {
+      <p class="alternate-package">
+        Suggested replacement: <strong>{{ deprecation.alternatePackage.id }}</strong>
+        @if (deprecation.alternatePackage.range) {
+          <span> ({{ deprecation.alternatePackage.range }})</span>
+        }
+      </p>
+    }
+  </section>
+}

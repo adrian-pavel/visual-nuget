@@ -1,0 +1,15 @@
+.solution-projects {
+  padding: 0.35rem 0.75rem;
+  border-top: 1px solid var(--vscode-panel-border);
+  font-size: 0.85rem;
+}
+
+.notice {
+  display: block;
+  padding-top: 0.3rem;
+  color: var(--vscode-descriptionForeground);
+}
+
+.error {
+  color: var(--vscode-errorForeground);
+}

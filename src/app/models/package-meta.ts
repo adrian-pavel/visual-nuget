@@ -18,16 +18,17 @@ export interface CatalogEntry {
   '@id': string;
   id: string;
   version: string;
-  description: string;
-  authors: string | string[];
-  iconUrl: string;
-  licenseUrl: string;
-  projectUrl: string;
-  tags: string | string[];
+  description?: string;
+  authors?: string | string[];
+  iconUrl?: string;
+  licenseUrl?: string;
+  projectUrl?: string;
+  tags?: string | string[];
   dependencyGroups: PackageDependencyGroup[] | undefined;
-  published: string;
-  listed: boolean;
-  vulnerabilities: Vulnerability[] | undefined;
+  published?: string;
+  listed?: boolean;
+  vulnerabilities?: Vulnerability[];
+  deprecation?: PackageDeprecation;
 }
 
 export interface PackageDependencyGroup {
@@ -42,5 +43,14 @@ export interface PackageDependency {
 
 export interface Vulnerability {
   advisoryUrl: string;
-  severity: string;
+  severity: number;
+}
+
+export interface PackageDeprecation {
+  message?: string;
+  reasons?: string[];
+  alternatePackage?: {
+    id: string;
+    range?: string;
+  };
 }

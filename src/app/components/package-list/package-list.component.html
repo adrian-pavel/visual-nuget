@@ -1,24 +1,84 @@
-<ng-container *ngIf="showSelectCheckboxes">
+@if (showSelectCheckboxes) {
   <div class="select-all">
     <span class="checkbox-with-label">
-      <input type="checkbox" id="selectAll" [checked]="areAllSelected" (click)="selectAll($event)" />
+      <input
+        type="checkbox"
+        id="selectAll"
+        [checked]="areAllSelected"
+        [disabled]="isPackageOperationInProgress"
+        (click)="selectAll($event)"
+      />
       <label for="selectAll">Select all</label>
     </span>
-    <button class="button" (click)="updateSelected()" [disabled]="selectionService.isEmpty">Update</button>
+    <span class="checkbox-with-label">
+      <input
+        type="checkbox"
+        id="buildAfterRestore"
+        [checked]="buildAfterRestore"
+        [disabled]="isPackageOperationInProgress"
+        (change)="onBuildAfterRestoreChange($event)"
+      />
+      <label for="buildAfterRestore">Build after restore</label>
+    </span>
+    <button class="button" (click)="updateSelected()" [disabled]="selectionService.isEmpty || isPackageOperationInProgress">Update</button>
   </div>
   <hr />
-</ng-container>
-<section *ngIf="packages && packages.length" class="package-list">
-  <app-package-row
-    *ngFor="let package of packages"
-    [package]="package"
-    [isActive]="package.id === currentSelectedPackageId"
-    [isSelected]="selectionService.isSelected(package)"
-    [showSelectionCheckbox]="showSelectCheckboxes"
-    (changeSelect)="rowSelectChange(package, $event)"
-  ></app-package-row>
-</section>
+}
+@if (contextLoading?.error) {
+  <div class="package-load-error" role="alert">{{ contextLoading.message }}</div>
+}
+@if (packages && packages.length) {
+  <section class="package-list">
+    @if (showTransitivePackages) {
+      @if (topLevelPackages.length > 0) {
+        <details class="top-level-packages" open>
+          <summary>Top-level packages ({{ topLevelPackages.length }})</summary>
+          @for (package of topLevelPackages; track package) {
+            <app-package-row
+              [package]="package"
+              [isActive]="package.id === currentSelectedPackageId"
+              [isSolution]="isSolution"
+              [isSelected]="selectionService.isSelected(package)"
+              [showSelectionCheckbox]="showSelectCheckboxes"
+              (changeSelect)="rowSelectChange(package, $event)"
+            ></app-package-row>
+          }
+        </details>
+      }
+      @if (transitivePackages.length > 0) {
+        <details class="transitive-packages" open>
+          <summary>Transitive packages ({{ transitivePackages.length }})</summary>
+          @for (package of transitivePackages; track package) {
+            <app-package-row
+              [package]="package"
+              [isActive]="package.id === currentSelectedPackageId"
+              [isSolution]="isSolution"
+              [isSelected]="selectionService.isSelected(package)"
+              [showSelectionCheckbox]="showSelectCheckboxes"
+              (changeSelect)="rowSelectChange(package, $event)"
+            ></app-package-row>
+          }
+        </details>
+      }
+    } @else {
+      @for (package of packages; track package) {
+        <app-package-row
+          [package]="package"
+          [isActive]="package.id === currentSelectedPackageId"
+          [isSolution]="isSolution"
+          [isSelected]="selectionService.isSelected(package)"
+          [showSelectionCheckbox]="showSelectCheckboxes"
+          (changeSelect)="rowSelectChange(package, $event)"
+        ></app-package-row>
+      }
+    }
+  </section>
+}
 
-<div *ngIf="packages && !packages.length" class="no-packages">No packages found for this query.</div>
+@if (packages && !packages.length) {
+  <div class="no-packages">No packages found for this query.</div>
+}
 
-<app-loading-spinner *ngIf="!packages"></app-loading-spinner>
+@if (loadError) {
+  <div class="package-load-error" role="alert">{{ loadError }}</div>
+}

@@ -1,3 +1,5 @@
+import { PackageDeprecation, Vulnerability } from './package-meta';
+
 export interface SearchResults {
   totalHits: number;
   data: PackageSearchResult[];
@@ -6,9 +8,11 @@ export interface SearchResults {
 export interface PackageSearchResult {
   id: string;
   version: string;
-  description: string;
-  authors: string | string[];
-  iconUrl: string;
+  description?: string;
+  authors?: string | string[];
+  iconUrl?: string;
   totalDownloads: number | undefined;
-  verified: boolean;
+  verified?: boolean;
+  vulnerabilities?: Vulnerability[];
+  deprecation?: PackageDeprecation;
 }

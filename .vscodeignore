@@ -1,4 +1,5 @@
 .angular
+.tsupgrader
 .vscode
 node_modules
 src
@@ -10,4 +11,9 @@ tsconfig**.json
 **/**.js.map
 coverage
 **jest**.ts
+.vscode-test.mjs
+src-ext/test/**
 angular.json
+.github/**
+__mocks__/**
+eslint.config.js

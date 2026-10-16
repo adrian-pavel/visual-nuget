@@ -17,6 +17,8 @@
       }
 
       &.category-button {
+        display: inline-flex;
+        align-items: center;
         font-size: 1rem;
         background: transparent;
         color: var(--vscode-tab-hoverForeground);
@@ -30,6 +32,29 @@
         &.active {
           color: var(--vscode-button-background);
           border-bottom: 2px solid var(--vscode-button-background);
+        }
+
+        .category-count {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 1.25rem;
+          height: 1.25rem;
+          margin-left: 0.35rem;
+          padding: 0 0.35rem;
+          border-radius: 999px;
+          background: var(--vscode-button-secondaryBackground, #4d4d4d);
+          color: var(--vscode-button-secondaryForeground, #ffffff);
+          font-size: 0.75rem;
+          font-weight: 600;
+          line-height: 1;
+          vertical-align: middle;
+          white-space: nowrap;
+
+          &.error {
+            background: var(--vscode-inputValidation-errorBackground);
+            color: var(--vscode-errorForeground);
+          }
         }
       }
     }

@@ -1,4 +1,10 @@
-.vulnerabilities-container {
+.vulnerabilities-container,
+.deprecation-container {
+  margin-bottom: 0.75rem;
+  padding: 0.6rem;
+  border-left: 3px solid var(--vscode-editorWarning-foreground);
+  background: var(--vscode-editorWarning-background, transparent);
+
   .header {
     .warning-icon {
       color: var(--vscode-notificationsWarningIcon-foreground);
@@ -14,7 +20,16 @@
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
   }
+
+  .deprecation-message,
+  .deprecation-reasons,
+  .alternate-package {
+    margin: 0.5rem 0 0;
+    overflow-wrap: anywhere;
+  }
+
   .vulnerability {
     margin-bottom: 0.25rem;
+    overflow-wrap: anywhere;
   }
 }

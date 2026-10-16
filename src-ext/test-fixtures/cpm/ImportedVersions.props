@@ -1,0 +1,5 @@
+<Project>
+  <ItemGroup>
+    <PackageVersion Include="Azure.Identity" Version="1.21.0" />
+  </ItemGroup>
+</Project>

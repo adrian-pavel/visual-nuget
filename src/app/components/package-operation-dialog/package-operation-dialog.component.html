@@ -1,0 +1,101 @@
+@if (isBusy) {
+  <div class="operation-backdrop" role="presentation">
+    <section class="operation-dialog progress-dialog" role="dialog" aria-modal="true" aria-labelledby="operation-progress-title" aria-busy="true">
+      <app-loading-spinner></app-loading-spinner>
+      <h2 id="operation-progress-title">Applying package changes</h2>
+      <p aria-live="polite">{{ progressMessage ?? 'Working…' }}</p>
+    </section>
+  </div>
+} @else if (operationResults.length > 0) {
+  <div class="operation-backdrop" role="presentation">
+    <section class="operation-dialog results-dialog" role="dialog" aria-modal="true" aria-labelledby="operation-results-title">
+      <header class="dialog-header" [class.has-failures]="failedOperationCount > 0">
+        <div>
+          <h2 id="operation-results-title">{{ resultHeading }}</h2>
+          <p>Review the operation summary and any items that need attention.</p>
+        </div>
+      </header>
+
+      <div class="dialog-content">
+        <div class="operation-summary" aria-label="Package operation summary">
+          <div class="summary-item succeeded">
+            <strong>{{ successfulOperationCount }}</strong>
+            <span>Succeeded</span>
+          </div>
+          <div class="summary-item failed">
+            <strong>{{ failedOperationCount }}</strong>
+            <span>Failed</span>
+          </div>
+          <div class="summary-item skipped">
+            <strong>{{ skippedOperationCount }}</strong>
+            <span>Skipped</span>
+          </div>
+        </div>
+
+        @if (packageChangeResults.length > 0) {
+          <div class="package-change-list" aria-label="Package changes">
+            @for (result of packageChangeResults; track $index) {
+              <article
+                class="package-change-row"
+                [class.is-success]="result.succeeded && !result.skipped"
+                [class.is-failure]="!result.succeeded && !result.skipped"
+                [class.is-skipped]="result.skipped"
+              >
+                <div class="package-change-content">
+                  <strong class="version-transition">{{ versionTransition(result) }}</strong>
+                  <span class="package-context">{{ result.operation }} · {{ result.projectPath }}</span>
+                  @if (result.message && (!result.succeeded || result.skipped)) {
+                    <div>
+                      <strong class="message-label">{{ result.skipped ? 'Skip details' : 'Failure details' }}</strong>
+                      <p class="change-message">{{ result.message }}</p>
+                    </div>
+                  }
+                </div>
+                <span
+                  class="status-icon"
+                  [class.is-success]="result.succeeded && !result.skipped"
+                  [class.is-failure]="!result.succeeded && !result.skipped"
+                  [class.is-skipped]="result.skipped"
+                  role="img"
+                  [attr.aria-label]="statusLabel(result)"
+                  >{{ result.skipped ? '–' : result.succeeded ? '✓' : '✕' }}</span
+                >
+              </article>
+            }
+          </div>
+        }
+
+        @if (failureDetails.length > 0) {
+          <section class="failure-details" aria-label="Failure details">
+            <h3>Failure details</h3>
+            @for (result of failureDetails; track $index) {
+              <article class="operation-failure">
+                <strong>{{ result.operation }} · {{ result.projectPath }}</strong>
+                <p>{{ result.message ?? 'The operation did not complete.' }}</p>
+              </article>
+            }
+          </section>
+        }
+
+        @if (packageChangeResults.length === 0 && failureDetails.length === 0) {
+          <p class="success-message">All requested package changes completed successfully.</p>
+        }
+        @if (failedOperationCount > 0) {
+          <p class="background-auth-note">
+            Interactive sign-in prompts are disabled for background operations. If a private feed caused this failure,
+            configure its credentials and try again.
+          </p>
+        }
+      </div>
+
+      <footer class="dialog-actions">
+        @if (rollbackId) {
+          <button class="button secondary" (click)="dismissResults()">Keep changes</button>
+          <button class="button" (click)="rollbackPackageUpdate()">Roll back package changes</button>
+        } @else {
+          <button class="button" (click)="dismissResults()">Close</button>
+        }
+      </footer>
+    </section>
+  </div>
+}

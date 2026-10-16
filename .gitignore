@@ -30,6 +30,7 @@ yarn-error.log
 
 # Miscellaneous
 /.angular/cache
+/.tsupgrader/
 .sass-cache/
 /connect.lock
 /coverage
@@ -42,3 +43,7 @@ testem.log
 Thumbs.db
 
 *.vsix
+
+# .NET build output
+**/[Bb]in/
+**/[Oo]bj/
